@@ -1,0 +1,25 @@
+package dev.codecompass;
+
+import java.util.regex.*;
+import org.springframework.stereotype.Service;
+
+/** Lightweight offline troubleshooting assistant. Replace this service with an LLM or retrieval provider as needed. */
+@Service
+public class SupportService {
+    public String answer(String input) {
+        String q = input.toLowerCase();
+        if (q.matches("(?s).*\\b(hi|hello|hey)\\b.*")) return "Hey! I'm CodeCompass. Share a question, code snippet, or exact error message and we'll work through it together.\n\nI can help explain concepts, trace likely bugs, and suggest debugging steps. What are you working on?";
+        if (q.contains("nullpointerexception") || q.contains("null pointer")) return "A `NullPointerException` means your code tried to use a reference that currently points to nothing (`null`).\n\n**Try this:**\n1. Find the first line in the stack trace that points to your code.\n2. Check every object used on that line and identify which one can be null.\n3. Initialize it, validate it at the boundary, or handle the missing case explicitly.\n\nIn Spring, also check constructor injection and whether the object is managed as a bean. Share the stack trace and nearby code if you want help pinpointing it.";
+        if (q.contains("404") || q.contains("not found")) return "A 404 means the requested route or resource wasn't found. Check the URL and HTTP method, confirm the controller mapping (including any class-level prefix), and verify the app is running on the port you expect. For a Spring controller, compare `@RequestMapping` and `@GetMapping`/`@PostMapping` with the exact request.";
+        if (q.contains("cors")) return "A CORS error means the browser blocked a cross-origin request because the server didn't allow that origin. Configure CORS on the API for the specific frontend origin and required methods/headers. Avoid allowing every origin for authenticated production endpoints. If you share your frontend URL and Spring configuration, I can suggest the exact setup.";
+        if (q.contains("dependency") || q.contains("could not resolve") || q.contains("artifact")) return "For a dependency resolution failure, check the exact group, artifact, and version; confirm the repository is reachable; then refresh your build's dependency cache. In Maven, try `mvn -U clean package` and inspect the first `Could not ...` line. If this started after adding a dependency, check for a version conflict or a library requiring a newer Java version. Paste the full error for a targeted diagnosis.";
+        if (q.contains("bean") || q.contains("autowired") || q.contains("no qualifying bean")) return "Spring can't find a bean of the requested type. Check that the implementation has `@Component`, `@Service`, or `@Repository`, and that it sits under the package scanned by your `@SpringBootApplication`. Prefer constructor injection; if the bean is conditional or profile-specific, verify that condition/profile is active.";
+        if (q.contains("compile") || q.contains("compilation") || q.contains("cannot find symbol")) return "A compilation error means the compiler couldn't build the source. Start with the first error (later ones may be consequences), check the reported file and line, then verify spelling, imports, types, and the Java version used by the build. Paste the complete compiler output and the surrounding code for a precise fix.";
+        if (q.contains("stackoverflowerror") || q.contains("infinite loop") || q.contains("recursion")) return "This often comes from recursion that never reaches a stopping case, or a loop whose state never changes toward its exit condition. Trace one iteration/call at a time, verify the base case, and inspect the variable that controls termination. Share the smallest reproducible snippet and expected result.";
+        if (q.contains("explain") || q.contains("what is") || q.contains("how does")) return "I can explain that. To make the answer specific, tell me the language or framework and paste the concept, code, or error you're looking at.\n\nA useful debugging routine is: reproduce the issue, read the earliest relevant error, reduce the code to a small example, form one hypothesis, and test it with a log or debugger.";
+        if (looksLikeError(input)) return "That looks like an error report. The most useful clue is usually the first error that points to your own code, plus a few lines around it. Check the file, line number, and the values involved there.\n\nCould you share the language/framework, the full error text, and the smallest relevant code snippet? Please remove secrets such as tokens or passwords first.";
+        return "Let's narrow this down. Please share the language/framework, what you expected to happen, what actually happened, and any exact error text. A short code snippet or minimal reproduction helps me identify the likely cause and give you actionable steps.";
+    }
+
+    private boolean looksLikeError(String text) { return Pattern.compile("(?i)(exception|error|failed|cannot|undefined|syntaxerror|traceback)").matcher(text).find(); }
+}
