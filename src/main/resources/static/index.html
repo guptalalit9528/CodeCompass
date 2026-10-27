@@ -1,0 +1,4466 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b100e">
+  <title>CodeCompass — Intelligent Developer Support</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ========================================================
+       DESIGN TOKENS & THEME VARIABLES
+       ======================================================== */
+    :root, [data-theme="dark"] {
+      --bg: #0b100e;
+      --surface: #121815;
+      --surface-card: #18221d;
+      --surface-hover: #1e2c25;
+      --surface-border: #23342b;
+      --border-highlight: #344c3f;
+
+      --accent: #bef264;
+      --accent-hover: #d9f99d;
+      --accent-glow: rgba(190, 242, 100, 0.22);
+      --accent-dark: #1b3512;
+      --accent-text: #112204;
+      --brand-compass: #a3e635;
+
+      --text: #edf2ee;
+      --text-muted: #8d9e94;
+      --text-dim: #5c6e63;
+
+      --danger: #ff6b6b;
+      --danger-bg: rgba(255, 107, 107, 0.12);
+      --danger-border: rgba(255, 107, 107, 0.35);
+
+      --warning: #f59e0b;
+      --warning-bg: rgba(245, 158, 11, 0.12);
+
+      --chat-user-bg: #18241e;
+      --chat-user-border: rgba(190, 242, 100, 0.25);
+      --chat-user-text: #f4f9f4;
+      --chat-bot-bg: #121815;
+      --chat-code-bg: #090e0c;
+      --auth-bg-gradient: radial-gradient(circle at 50% 0%, rgba(190, 242, 100, 0.08), transparent 50%), var(--bg);
+      --topbar-bg: rgba(11, 16, 14, 0.85);
+      --modal-bg: #121815;
+      --shadow-ambient: 0 16px 48px rgba(0, 0, 0, 0.6);
+      --dropdown-bg: #151e19;
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+      --transition-smooth: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    [data-theme="light"] {
+      --bg: #f7faf7;
+      --surface: #ffffff;
+      --surface-card: #f1f5f1;
+      --surface-hover: #e5ede5;
+      --surface-border: #dde5dd;
+      --border-highlight: #c8d6c8;
+
+      --accent: #bbf246;
+      --accent-hover: #a3e635;
+      --accent-glow: rgba(163, 230, 53, 0.25);
+      --accent-dark: #e8f5df;
+      --accent-text: #142405;
+      --brand-compass: #4d7c0f;
+
+      --text: #18221b;
+      --text-muted: #57675c;
+      --text-dim: #85968b;
+
+      --danger: #dc2626;
+      --danger-bg: rgba(220, 38, 38, 0.08);
+      --danger-border: rgba(220, 38, 38, 0.25);
+
+      --warning: #d97706;
+      --warning-bg: rgba(217, 119, 6, 0.08);
+
+      --chat-user-bg: #eaf5e3;
+      --chat-user-border: rgba(77, 124, 15, 0.25);
+      --chat-user-text: #142405;
+      --chat-bot-bg: #ffffff;
+      --chat-code-bg: #f4f7f4;
+      --auth-bg-gradient: radial-gradient(circle at 50% 0%, rgba(187, 242, 70, 0.12), transparent 50%), #f7faf7;
+      --topbar-bg: rgba(247, 250, 247, 0.9);
+      --modal-bg: #ffffff;
+      --shadow-ambient: 0 16px 40px rgba(0, 0, 0, 0.08);
+      --dropdown-bg: #ffffff;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      font-size: 14px;
+      line-height: 1.5;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    button, input, textarea, select {
+      font-family: inherit;
+      color: inherit;
+    }
+    button { cursor: pointer; }
+    .hidden { display: none !important; }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--surface-border); border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+    /* BRAND LOGO — Matched to Reference Image */
+    .brand {
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      font-size: 19px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text);
+      text-decoration: none;
+      user-select: none;
+    }
+    .brand-mark {
+      height: 34px;
+      width: 34px;
+      border-radius: 10px;
+      background: var(--accent);
+      color: var(--accent-text);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 3px 10px var(--accent-glow);
+      font-weight: 900;
+      font-size: 18px;
+      flex: none;
+    }
+    .brand-text {
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+    .brand-text em {
+      font-style: normal;
+      color: var(--brand-compass);
+      font-weight: 900;
+    }
+
+    /* BADGES */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 3px 8px;
+      border-radius: 99px;
+      border: 1px solid transparent;
+      line-height: 1.2;
+    }
+    .badge-success {
+      background: var(--accent-dark);
+      color: var(--accent);
+      border-color: rgba(190, 242, 100, 0.3);
+    }
+    [data-theme="light"] .badge-success {
+      background: #e8f5df;
+      color: #3b6b17;
+      border-color: rgba(77, 124, 15, 0.3);
+    }
+    .badge-muted {
+      background: var(--surface-card);
+      color: var(--text-muted);
+      border-color: var(--surface-border);
+    }
+    .badge-warning {
+      background: var(--warning-bg);
+      color: var(--warning);
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+    .badge-danger {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border-color: var(--danger-border);
+    }
+
+    /* FORMS & BUTTONS */
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+    .field label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .field input, .field textarea, .field select {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      font-size: 14px;
+      color: var(--text);
+      outline: 0;
+      transition: var(--transition-smooth);
+    }
+    .field input:focus, .field textarea:focus, .field select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: var(--accent-text);
+      border: 0;
+      border-radius: var(--radius-md);
+      padding: 11px 18px;
+      font-weight: 700;
+      font-size: 14px;
+      transition: var(--transition-smooth);
+      box-shadow: 0 4px 14px var(--accent-glow);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    button.primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+    button.primary:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    button.secondary {
+      background: var(--surface-card);
+      color: var(--text);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      font-weight: 600;
+      font-size: 13.5px;
+      transition: var(--transition-smooth);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    button.secondary:hover {
+      background: var(--surface-hover);
+      border-color: var(--border-highlight);
+    }
+
+    button.danger {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid var(--danger-border);
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      font-weight: 600;
+      font-size: 13.5px;
+      transition: var(--transition-smooth);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    button.danger:hover {
+      background: rgba(255, 107, 107, 0.2);
+    }
+
+    .notice {
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      line-height: 1.4;
+      background: var(--accent-dark);
+      color: var(--accent);
+      border: 1px solid rgba(190, 242, 100, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .notice.error {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border-color: var(--danger-border);
+    }
+    .notice.warning {
+      background: var(--warning-bg);
+      color: var(--warning);
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+
+    /* THEME TOGGLE BUTTON */
+    .theme-toggle {
+      border: 1px solid var(--surface-border);
+      background: var(--surface-card);
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      padding: 6px 10px;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition-smooth);
+    }
+    .theme-toggle:hover {
+      background: var(--surface-hover);
+      color: var(--text);
+      border-color: var(--border-highlight);
+    }
+
+    /* ========================================================
+       AUTH SCREEN — Matched to Reference Image Style
+       ======================================================== */
+    .auth-screen {
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: var(--auth-bg-gradient);
+      overflow-y: auto;
+      transition: background 0.3s ease;
+    }
+    .auth-card {
+      width: min(440px, 100%);
+      padding: 38px 34px;
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+      box-shadow: var(--shadow-ambient);
+      animation: fadeIn 0.35s ease-out;
+      position: relative;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .auth-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 26px;
+    }
+    .auth-card h1 {
+      margin: 0 0 6px;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .auth-card p {
+      margin: 0 0 24px;
+      color: var(--text-muted);
+      font-size: 13.5px;
+      line-height: 1.45;
+    }
+    .auth-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid var(--surface-border);
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .auth-links button {
+      background: none;
+      border: 0;
+      color: var(--brand-compass);
+      font-weight: 600;
+      padding: 0;
+      text-align: left;
+    }
+    .auth-links button:hover { text-decoration: underline; }
+
+    /* ========================================================
+       APPLICATION WORKSPACE SHELL
+       ======================================================== */
+    .app {
+      display: grid;
+      grid-template-columns: 270px 1fr;
+      height: 100dvh;
+      position: relative;
+    }
+
+    /* PRIMARY SIDEBAR */
+    .sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--surface-border);
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      gap: 12px;
+      min-width: 0;
+      z-index: 20;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease;
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-bottom: 4px;
+    }
+
+    .btn-new-chat {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 12.5px;
+      font-weight: 700;
+      padding: 7px 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition-smooth);
+    }
+    .btn-new-chat:hover {
+      background: var(--accent);
+      color: var(--accent-text);
+      border-color: var(--accent);
+      box-shadow: 0 2px 10px var(--accent-glow);
+    }
+
+    .sidebar-search {
+      position: relative;
+      margin-bottom: 4px;
+    }
+    .sidebar-search input {
+      width: 100%;
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px 8px 30px;
+      font-size: 13px;
+      color: var(--text);
+      outline: 0;
+      transition: var(--transition-smooth);
+    }
+    .sidebar-search input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-glow);
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .nav-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-height: 0;
+    }
+    .nav-group.conversations-group {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .section-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-dim);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 8px 4px 4px;
+      user-select: none;
+    }
+    .icon-btn {
+      border: 0;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 16px;
+      line-height: 1;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .icon-btn:hover { background: var(--surface-hover); color: var(--text); }
+
+    .projects-scroll {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .project-pill {
+      border: 1px solid var(--surface-border);
+      background: var(--surface-card);
+      color: var(--text-muted);
+      border-radius: 99px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: var(--transition-smooth);
+    }
+    .project-pill:hover, .project-pill.active {
+      color: var(--text);
+      background: var(--surface-hover);
+      border-color: var(--border-highlight);
+    }
+    .project-pill.active {
+      background: var(--accent-dark);
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      overflow-y: auto;
+      flex: 1;
+      margin: 0 -4px;
+      padding: 0 4px;
+    }
+    .list-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      text-align: left;
+      font-size: 13px;
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      transition: var(--transition-smooth);
+    }
+    .list-item.active, .list-item:hover {
+      background: var(--surface-card);
+      color: var(--text);
+      border-color: var(--surface-border);
+    }
+    .list-item.active {
+      border-color: var(--accent);
+      background: var(--accent-dark);
+      color: var(--text);
+    }
+    .row-menu {
+      border: 0;
+      background: transparent;
+      color: var(--text-dim);
+      padding: 6px;
+      border-radius: 6px;
+      opacity: 0.7;
+      transition: var(--transition-smooth);
+    }
+    .row-menu:hover { background: var(--surface-hover); opacity: 1; color: var(--text); }
+
+    /* BOTTOM ACCOUNT CONTROL & COMPACT FLOATING DROPDOWN */
+    .sidebar-bottom {
+      margin-top: auto;
+      border-top: 1px solid var(--surface-border);
+      padding: 12px 0 0;
+      position: relative;
+    }
+
+    .account-control {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+      border: 1px solid var(--surface-border);
+      background: var(--surface-card);
+      border-radius: var(--radius-md);
+      padding: 8px 10px;
+      transition: var(--transition-smooth);
+    }
+    .account-control:hover {
+      background: var(--surface-hover);
+      border-color: var(--border-highlight);
+    }
+    .account-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      background: var(--accent);
+      color: var(--accent-text);
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      font-weight: 800;
+      flex: none;
+    }
+    .account-avatar.sm {
+      width: 28px;
+      height: 28px;
+      font-size: 12px;
+    }
+    .account-details {
+      min-width: 0;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .account-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .account-email {
+      font-size: 11px;
+      color: var(--text-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .role-badge {
+      font-size: 10px;
+      font-weight: 800;
+      background: var(--accent-dark);
+      color: var(--accent);
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .dropdown-chevron {
+      opacity: 0.6;
+      font-size: 13px;
+    }
+
+    /* COMPACT FLOATING DROPDOWN — 3 Organized Groups */
+    .account-dropdown {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      background: var(--dropdown-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+      padding: 6px;
+      z-index: 60;
+      animation: fadeIn 0.15s ease-out;
+    }
+    .dropdown-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .dropdown-group-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      color: var(--text-dim);
+      padding: 6px 10px 2px;
+    }
+    .dropdown-identity {
+      padding: 10px;
+      background: var(--surface-card);
+      border-radius: var(--radius-md);
+      margin-bottom: 4px;
+    }
+    .identity-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .identity-text {
+      min-width: 0;
+      flex: 1;
+    }
+    .identity-text strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .identity-text small {
+      display: block;
+      font-size: 11px;
+      color: var(--text-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .identity-badges {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .profile-link {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--brand-compass);
+      text-decoration: none;
+    }
+    .profile-link:hover { text-decoration: underline; }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 7px 10px;
+      border-radius: var(--radius-sm);
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      font-size: 12.5px;
+      font-weight: 500;
+      text-align: left;
+      text-decoration: none;
+      transition: var(--transition-smooth);
+    }
+    .dropdown-item:hover {
+      background: var(--surface-hover);
+      color: var(--accent);
+    }
+    .dropdown-item span.icon {
+      font-size: 14px;
+      width: 18px;
+      text-align: center;
+      opacity: 0.85;
+    }
+    .dropdown-divider {
+      height: 1px;
+      background: var(--surface-border);
+      margin: 4px 0;
+    }
+    .signout-item {
+      color: var(--danger) !important;
+    }
+    .signout-item:hover {
+      background: var(--danger-bg) !important;
+      color: var(--danger) !important;
+    }
+
+    /* ========================================================
+       MAIN CHAT WORKSPACE
+       ======================================================== */
+    .main {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: var(--bg);
+      position: relative;
+      transition: background 0.3s ease;
+    }
+
+    .topbar {
+      height: 56px;
+      border-bottom: 1px solid var(--surface-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      flex: none;
+      background: var(--topbar-bg);
+      backdrop-filter: blur(12px);
+      z-index: 5;
+    }
+    .crumb {
+      font-size: 13px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .crumb strong { color: var(--text); font-weight: 600; }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      border: 1px solid var(--surface-border);
+      background: var(--surface-card);
+      border-radius: var(--radius-sm);
+      padding: 7px 10px;
+      color: var(--text);
+      font-size: 16px;
+      margin-right: 10px;
+    }
+
+    /* CHAT STREAM */
+    .chat-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .welcome-card {
+      max-width: 660px;
+      margin: 40px auto 20px;
+      text-align: center;
+      padding: 0 16px;
+    }
+    .welcome-card .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--brand-compass);
+      margin-bottom: 12px;
+    }
+    .welcome-card h1 {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -0.7px;
+      margin: 0 0 12px;
+      line-height: 1.25;
+    }
+    .welcome-card p {
+      color: var(--text-muted);
+      font-size: 14.5px;
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    .chat {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 780px;
+      width: 100%;
+      margin: 0 auto;
+      padding-bottom: 24px;
+    }
+    .message-row {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      animation: fadeIn 0.25s ease-out;
+    }
+    .message-row.user { justify-content: flex-end; }
+
+    .message-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      font-weight: 900;
+      flex: none;
+    }
+    .message-row.bot .message-avatar {
+      background: var(--accent);
+      color: var(--accent-text);
+      box-shadow: 0 2px 8px var(--accent-glow);
+    }
+    .message-row.user .message-avatar {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      color: var(--text-muted);
+    }
+
+    .bubble {
+      max-width: min(650px, 86%);
+      padding: 14px 18px;
+      border-radius: var(--radius-lg);
+      line-height: 1.6;
+      font-size: 14px;
+      word-break: break-word;
+    }
+    .message-row.user .bubble {
+      background: var(--chat-user-bg);
+      color: var(--chat-user-text);
+      border: 1px solid var(--chat-user-border);
+      border-bottom-right-radius: 4px;
+    }
+    .message-row.bot .bubble {
+      background: var(--chat-bot-bg);
+      color: var(--text);
+      border: 1px solid var(--surface-border);
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 14px rgba(0, 0, 0, 0.04);
+    }
+
+    /* CODE BLOCK WRAPPER & COPY CONTROLS */
+    .code-block-wrapper {
+      margin: 12px 0;
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--chat-code-bg);
+    }
+    .code-block-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 12px;
+      background: var(--surface-card);
+      border-bottom: 1px solid var(--surface-border);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+      user-select: none;
+    }
+    .code-copy-btn {
+      border: 0;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      transition: var(--transition-smooth);
+    }
+    .code-copy-btn:hover {
+      background: var(--surface-hover);
+      color: var(--accent);
+    }
+    .code-block-wrapper pre {
+      margin: 0;
+      padding: 12px 14px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.6;
+      background: transparent;
+      border: 0;
+    }
+    .inline-code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: var(--surface-card);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--surface-border);
+      color: var(--brand-compass);
+    }
+
+    /* SUGGESTION TILES */
+    .suggestions {
+      width: min(780px, 100%);
+      margin: auto auto 20px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .suggestion {
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      background: var(--surface-card);
+      padding: 16px 14px;
+      text-align: left;
+      min-height: 84px;
+      color: var(--text);
+      transition: var(--transition-smooth);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .suggestion:hover {
+      border-color: var(--accent);
+      background: var(--surface-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    }
+    .suggestion strong { font-size: 13px; font-weight: 700; color: var(--text); }
+    .suggestion small {
+      display: block;
+      color: var(--text-muted);
+      font-size: 11.5px;
+      margin-top: 5px;
+      line-height: 1.4;
+    }
+
+    /* COMPOSER */
+    .composer-wrap {
+      width: 100%;
+      padding: 0 24px 20px;
+      background: linear-gradient(180deg, transparent, var(--bg) 25%);
+    }
+    .composer {
+      max-width: 780px;
+      margin: 0 auto;
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      padding: 12px 14px 10px;
+      box-shadow: var(--shadow-ambient);
+      transition: var(--transition-smooth);
+    }
+    .composer:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    .composer textarea {
+      width: 100%;
+      height: 44px;
+      max-height: 160px;
+      resize: none;
+      border: 0;
+      outline: 0;
+      padding: 4px 2px;
+      color: var(--text);
+      font-size: 14px;
+      background: transparent;
+      line-height: 1.5;
+    }
+    .composer textarea::placeholder { color: var(--text-dim); }
+    .compose-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 8px;
+      border-top: 1px solid var(--surface-border);
+      margin-top: 6px;
+    }
+    .send {
+      width: 32px;
+      height: 32px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--accent);
+      color: var(--accent-text);
+      font-size: 16px;
+      font-weight: 900;
+      display: grid;
+      place-items: center;
+      transition: var(--transition-smooth);
+    }
+    .send:hover { background: var(--accent-hover); transform: scale(1.05); }
+    .send:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .hint { font-size: 11.5px; color: var(--text-dim); }
+    .footer-note {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 8px;
+    }
+
+    /* ========================================================
+       DEDICATED DEVELOPER SETTINGS VIEW
+       ======================================================== */
+    .settings-view {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      height: 100dvh;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .settings-sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--surface-border);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 16px;
+      gap: 16px;
+      overflow-y: auto;
+    }
+
+    .settings-brand-header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--surface-border);
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--surface-border);
+      background: var(--surface-card);
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      padding: 6px 12px;
+      font-size: 12.5px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: var(--transition-smooth);
+      width: fit-content;
+    }
+    .back-btn:hover {
+      background: var(--surface-hover);
+      color: var(--text);
+      border-color: var(--border-highlight);
+    }
+
+    .settings-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+    .settings-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 13.5px;
+      font-weight: 600;
+      text-align: left;
+      transition: var(--transition-smooth);
+      text-decoration: none;
+    }
+    .settings-nav-item:hover {
+      background: var(--surface-card);
+      color: var(--text);
+    }
+    .settings-nav-item.active {
+      background: var(--accent-dark);
+      color: var(--text);
+      border-color: var(--accent);
+      box-shadow: 0 0 16px rgba(190, 242, 100, 0.08);
+    }
+    .settings-nav-item span.icon {
+      font-size: 15px;
+      width: 20px;
+      text-align: center;
+    }
+    .settings-nav-item.danger-link {
+      color: var(--danger);
+      margin-top: 12px;
+      border-top: 1px solid var(--surface-border);
+      padding-top: 12px;
+      border-radius: 0;
+    }
+    .settings-nav-item.danger-link:hover {
+      background: var(--danger-bg);
+      border-radius: var(--radius-md);
+    }
+
+    .settings-content-wrap {
+      overflow-y: auto;
+      padding: 40px 48px 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .settings-content {
+      width: min(840px, 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .settings-header-banner {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      border-bottom: 1px solid var(--surface-border);
+      padding-bottom: 20px;
+    }
+    .settings-header-banner h1 {
+      margin: 0 0 6px;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.6px;
+    }
+    .settings-header-banner p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .settings-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow-ambient);
+    }
+    .settings-card h2 {
+      margin: 0 0 4px;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .settings-card-subtitle {
+      margin: 0 0 20px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .profile-hero {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding-bottom: 24px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--surface-border);
+    }
+    .hero-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: var(--radius-lg);
+      background: var(--accent);
+      color: var(--accent-text);
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+      font-weight: 900;
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+    .hero-info h3 {
+      margin: 0 0 4px;
+      font-size: 20px;
+      font-weight: 800;
+    }
+    .hero-info .meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-muted);
+      font-size: 13px;
+      flex-wrap: wrap;
+    }
+
+    /* DATA TABLE */
+    .table-container {
+      overflow-x: auto;
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      margin-top: 14px;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+    .data-table th {
+      background: var(--surface-card);
+      color: var(--text-muted);
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--surface-border);
+    }
+    .data-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--surface-border);
+      color: var(--text);
+    }
+    .data-table tr:last-child td { border-bottom: 0; }
+    .data-table tr:hover td { background: var(--surface-hover); }
+    .mono { font-family: var(--font-mono); font-size: 12px; }
+
+    /* STATS GRID */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .stat-card .label {
+      font-size: 11.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+    }
+    .stat-card .value {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.5px;
+    }
+    .stat-card .desc {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    /* DANGER ZONE */
+    .danger-zone-card {
+      border: 1px solid var(--danger-border);
+      background: var(--danger-bg);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+    }
+    .danger-zone-card h2 {
+      color: var(--danger);
+      margin: 0 0 6px;
+      font-size: 18px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .danger-zone-card p {
+      color: var(--text-muted);
+      font-size: 13px;
+      margin: 0 0 20px;
+    }
+    .danger-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 0;
+      border-top: 1px solid rgba(255, 107, 107, 0.2);
+    }
+    .danger-item:first-of-type { border-top: 0; padding-top: 0; }
+    .danger-item-copy strong { display: block; font-size: 13.5px; margin-bottom: 2px; }
+    .danger-item-copy small { color: var(--text-muted); font-size: 12px; }
+
+    /* RADIO CARDS */
+    .radio-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .radio-card {
+      border: 1px solid var(--surface-border);
+      background: var(--surface-card);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: var(--transition-smooth);
+    }
+    .radio-card:hover { border-color: var(--border-highlight); background: var(--surface-hover); }
+    .radio-card.active {
+      border-color: var(--accent);
+      background: var(--accent-dark);
+      color: var(--text);
+    }
+    .radio-card strong { font-size: 13.5px; font-weight: 700; }
+    .radio-card small { font-size: 11.5px; color: var(--text-muted); }
+
+    /* MODALS */
+    dialog.modal {
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-xl);
+      background: var(--modal-bg);
+      color: var(--text);
+      padding: 32px;
+      max-width: 520px;
+      width: calc(100% - 32px);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+      animation: fadeIn 0.2s ease-out;
+    }
+    dialog::backdrop {
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(4px);
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--surface-border);
+    }
+
+    .secret-box {
+      background: var(--chat-code-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      word-break: break-all;
+      margin: 14px 0;
+    }
+
+    /* CODECOMPASS PRO WORKSPACE EXTENSIONS */
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .modal-header h2 { margin: 0; font-size: 18px; font-weight: 800; }
+    dialog.wide-modal { max-width: 820px; width: min(820px, 94vw); }
+
+    .telemetry-pill {
+      background: var(--accent-dark);
+      color: var(--accent);
+      border: 1px solid rgba(190, 242, 100, 0.35);
+      border-radius: 99px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      font-family: var(--font-mono);
+    }
+    .telemetry-pill:hover {
+      background: var(--accent);
+      color: var(--accent-text);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+    [data-theme="light"] .telemetry-pill {
+      background: #e8f5df;
+      color: #3b6b17;
+      border-color: rgba(77, 124, 15, 0.3);
+    }
+
+    .pro-tool-btn {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 5px 9px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+    .pro-tool-btn:hover {
+      background: var(--surface-hover);
+      color: var(--text);
+      border-color: var(--border-highlight);
+    }
+
+    .branch-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-sm);
+      padding: 3px 8px;
+      margin-left: 8px;
+    }
+    .branch-select {
+      background: transparent;
+      border: 0;
+      color: var(--accent);
+      font-size: 11.5px;
+      font-weight: 700;
+      outline: 0;
+      cursor: pointer;
+      font-family: var(--font-mono);
+    }
+    .branch-btn {
+      background: transparent;
+      border: 0;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 0 3px;
+    }
+    .branch-btn:hover { color: var(--accent); }
+
+    /* SPOTLIGHT COMMAND PALETTE */
+    dialog.palette-modal {
+      top: 12vh;
+      max-width: 620px;
+      width: min(620px, 94vw);
+      padding: 0;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .palette-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--surface-border);
+      background: var(--surface-card);
+    }
+    .palette-icon {
+      font-size: 18px;
+      color: var(--brand-compass);
+      font-weight: 900;
+    }
+    .palette-input {
+      flex: 1;
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 600;
+      outline: 0;
+    }
+    .palette-badge {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 4px;
+      padding: 2px 6px;
+      color: var(--text-dim);
+    }
+    .palette-results {
+      max-height: 360px;
+      overflow-y: auto;
+      padding: 6px;
+    }
+    .palette-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 12px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+    .palette-item:hover, .palette-item.selected {
+      background: var(--surface-hover);
+    }
+    .palette-item-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .palette-item-icon { font-size: 16px; flex: none; }
+    .palette-item-title { font-size: 13.5px; font-weight: 600; color: var(--text); }
+    .palette-item-desc { font-size: 11px; color: var(--text-muted); }
+    .palette-item-shortcut {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: 4px;
+      padding: 2px 6px;
+    }
+
+    /* AST TREE VISUALIZER */
+    .ast-tree-container {
+      background: var(--chat-code-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      max-height: 440px;
+      overflow: auto;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+    }
+    .ast-node {
+      padding: 4px 6px;
+      margin: 2px 0;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ast-node:hover { background: var(--surface-hover); }
+    .ast-badge {
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .ast-badge.class { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.35); }
+    .ast-badge.method { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35); }
+    .ast-badge.control { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); }
+    .ast-line-num { color: var(--text-dim); font-size: 11px; min-width: 28px; }
+
+    /* DIFF & PATCH VIEWER */
+    .diff-stats {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .diff-container {
+      background: var(--chat-code-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      max-height: 420px;
+      overflow: auto;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .diff-line {
+      display: flex;
+      align-items: center;
+      padding: 2px 10px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .diff-line.added {
+      background: rgba(34, 197, 94, 0.12);
+      color: #4ade80;
+    }
+    .diff-line.deleted {
+      background: rgba(239, 68, 68, 0.12);
+      color: #f87171;
+    }
+    .diff-line.header {
+      background: var(--surface-card);
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    /* MULTI-MODEL GRID */
+    .multi-model-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 14px;
+      max-height: 480px;
+      overflow-y: auto;
+    }
+    @media (max-width: 720px) { .multi-model-grid { grid-template-columns: 1fr; } }
+    .model-card {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .model-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--surface-border);
+    }
+    .model-title { font-weight: 800; font-size: 13.5px; color: var(--text); }
+    .model-metrics { font-size: 11px; font-family: var(--font-mono); color: var(--accent); }
+    .model-content { font-size: 13px; line-height: 1.55; white-space: pre-wrap; flex: 1; }
+
+    /* DRAWER LISTS (Context & Checkpoints) */
+    .drawer-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 10px;
+    }
+    .drawer-item {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .drawer-item-title { font-weight: 700; font-size: 13px; color: var(--text); }
+    .drawer-item-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* TERMINAL ACTION BAR & CODE ACTIONS */
+    .code-action-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .terminal-action-btn {
+      background: transparent;
+      border: 1px solid var(--surface-border);
+      color: var(--text-muted);
+      border-radius: 4px;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 7px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+    .terminal-action-btn:hover {
+      background: var(--accent);
+      color: var(--accent-text);
+      border-color: var(--accent);
+    }
+
+    /* BACKDROP FOR MOBILE SIDEBAR */
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(3px);
+      z-index: 15;
+    }
+
+    /* RESPONSIVE BREAKPOINTS */
+    @media (max-width: 900px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .radio-cards { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 280px;
+        transform: translateX(-100%);
+      }
+      .sidebar.mobile-open {
+        transform: translateX(0);
+        box-shadow: 0 0 32px rgba(0, 0, 0, 0.7);
+      }
+      .sidebar-backdrop.open { display: block; }
+      .mobile-menu-btn { display: inline-flex; }
+      .suggestions { grid-template-columns: 1fr; }
+      .topbar { padding: 0 16px; }
+
+      /* Settings Mobile Layout */
+      .settings-view { grid-template-columns: 1fr; }
+      .settings-sidebar {
+        border-right: 0;
+        border-bottom: 1px solid var(--surface-border);
+        padding: 14px 16px;
+      }
+      .settings-nav {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+      .settings-nav-item { white-space: nowrap; padding: 8px 12px; font-size: 12.5px; }
+      .settings-content-wrap { padding: 20px 16px 40px; }
+      .settings-card { padding: 20px 16px; }
+      .stats-grid { grid-template-columns: 1fr; }
+
+      .account-dropdown {
+        left: 10px;
+        right: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BACKDROP FOR MOBILE DRAWER -->
+  <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
+  <!-- AUTHENTICATION SCREEN -->
+  <div id="authScreen" class="auth-screen">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="brand">
+          <div class="brand-mark">⌘</div>
+          <span class="brand-text"><em>Code</em>Compass</span>
+        </div>
+        <button id="authThemeToggle" class="theme-toggle" type="button" aria-label="Toggle theme">
+          <span class="theme-icon">☀️</span>
+        </button>
+      </div>
+
+      <div id="authNotice" class="notice hidden" role="status"></div>
+
+      <!-- LOGIN -->
+      <form id="loginForm">
+        <h1>Welcome back</h1>
+        <p>Sign in to your CodeCompass developer workspace.</p>
+        <div class="field">
+          <label for="loginEmail">Email address</label>
+          <input id="loginEmail" type="email" autocomplete="username" required placeholder="developer@domain.com">
+        </div>
+        <div class="field">
+          <label for="loginPassword">Password</label>
+          <input id="loginPassword" type="password" autocomplete="current-password" required placeholder="••••••••">
+        </div>
+        <button class="primary" type="submit" style="width:100%;margin-top:6px;">Sign in</button>
+        <div class="auth-links">
+          <button type="button" data-auth="register">Don’t have an account? Create one</button>
+          <button type="button" data-auth="forgot">Forgot your password?</button>
+          <button type="button" data-auth="resend">Need another verification email?</button>
+        </div>
+      </form>
+
+      <!-- REGISTER -->
+      <form id="registerForm" class="hidden">
+        <h1>Create account</h1>
+        <p>Get started with intelligent developer support.</p>
+        <div class="field">
+          <label for="regName">Full name</label>
+          <input id="regName" required placeholder="Alex Mercer">
+        </div>
+        <div class="field">
+          <label for="regEmail">Email address</label>
+          <input id="regEmail" type="email" autocomplete="email" required placeholder="developer@domain.com">
+        </div>
+        <div class="field">
+          <label for="regPassword">Password (6–18 characters)</label>
+          <input id="regPassword" type="password" autocomplete="new-password" minlength="6" maxlength="18" required placeholder="••••••••">
+        </div>
+        <button class="primary" type="submit" style="width:100%;margin-top:6px;">Create account</button>
+        <div class="auth-links">
+          <button type="button" data-auth="login">Already have an account? Sign in</button>
+        </div>
+      </form>
+
+      <!-- FORGOT PASSWORD -->
+      <form id="forgotForm" class="hidden">
+        <h1>Reset password</h1>
+        <p>Enter your account email to receive a password recovery link.</p>
+        <div class="field">
+          <label for="forgotEmail">Email address</label>
+          <input id="forgotEmail" type="email" autocomplete="email" required placeholder="developer@domain.com">
+        </div>
+        <button class="primary" type="submit" style="width:100%;margin-top:6px;">Send reset link</button>
+        <div class="auth-links">
+          <button type="button" data-auth="login">Back to sign in</button>
+        </div>
+      </form>
+
+      <!-- RESEND VERIFICATION -->
+      <form id="resendForm" class="hidden">
+        <h1>Resend verification</h1>
+        <p>We’ll send a fresh activation link to your email address.</p>
+        <div class="field">
+          <label for="resendEmail">Email address</label>
+          <input id="resendEmail" type="email" autocomplete="email" required placeholder="developer@domain.com">
+        </div>
+        <button class="primary" type="submit" style="width:100%;margin-top:6px;">Resend link</button>
+        <div class="auth-links">
+          <button type="button" data-auth="login">Back to sign in</button>
+        </div>
+      </form>
+
+      <!-- RESET PASSWORD TOKEN -->
+      <form id="resetForm" class="hidden">
+        <h1>Choose a new password</h1>
+        <p>Choose a password from 6 to 18 characters.</p>
+        <div class="field">
+          <label for="resetPassword">Password</label>
+          <input id="resetPassword" type="password" autocomplete="new-password" minlength="6" maxlength="18" required placeholder="••••••••">
+        </div>
+        <button class="primary" type="submit" style="width:100%;margin-top:6px;">Update password</button>
+        <div class="auth-links">
+          <button type="button" data-auth="login">Back to sign in</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CHAT APPLICATION SHELL -->
+  <div id="appShell" class="app hidden">
+    <!-- PRIMARY NAVIGATION SIDEBAR -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="brand-mark">⌘</div>
+          <span class="brand-text"><em>Code</em>Compass</span>
+        </div>
+        <button id="newChat" class="btn-new-chat" title="New chat (Ctrl+Shift+O)">
+          <span>+</span> New Chat
+        </button>
+      </div>
+
+      <div class="sidebar-search">
+        <span class="search-icon">🔍</span>
+        <input id="conversationSearch" type="search" placeholder="Search chats… (Ctrl+K)">
+      </div>
+
+      <!-- WORKSPACE: PROJECTS -->
+      <div class="nav-group">
+        <div class="section-title">
+          <span>Projects</span>
+          <button id="createProject" class="icon-btn" title="Create project">+</button>
+        </div>
+        <div class="projects-scroll" id="projects"></div>
+      </div>
+
+      <!-- MAIN NAVIGATION: RECENT CONVERSATIONS -->
+      <div class="nav-group conversations-group">
+        <div class="section-title">
+          <span>Recent Conversations</span>
+        </div>
+        <div class="list" id="conversations"></div>
+      </div>
+
+      <!-- BOTTOM ACCOUNT CONTROL & COMPACT FLOATING DROPDOWN -->
+      <div class="sidebar-bottom">
+        <button id="accountButton" class="account-control" type="button" aria-haspopup="true" aria-expanded="false">
+          <div class="account-avatar" id="userAvatar">D</div>
+          <div class="account-details">
+            <span class="account-name" id="userName">Developer</span>
+            <span class="account-email" id="userEmail">developer@codecompass.dev</span>
+          </div>
+          <span class="role-badge" id="sidebarRoleBadge">Dev</span>
+          <span class="dropdown-chevron">⋮</span>
+        </button>
+
+        <!-- COMPACT FLOATING DROPDOWN (3 ORGANIZED GROUPS) -->
+        <div id="accountDropdown" class="account-dropdown hidden">
+          <!-- 1. Identity Group -->
+          <div class="dropdown-group dropdown-identity">
+            <div class="identity-top">
+              <div class="account-avatar sm" id="dropdownAvatar">D</div>
+              <div class="identity-text">
+                <strong id="dropdownUserName">Developer</strong>
+                <small id="dropdownUserEmail">developer@codecompass.dev</small>
+              </div>
+            </div>
+            <div class="identity-badges">
+              <span class="badge badge-success" id="dropdownRoleBadge">Developer</span>
+              <span class="badge badge-muted" id="dropdownPlanBadge">Free Tier</span>
+            </div>
+            <a href="#settings/profile" class="profile-link" data-route="settings/profile">
+              View Profile →
+            </a>
+          </div>
+
+          <div class="dropdown-divider"></div>
+
+          <!-- 2. Developer Tools Group -->
+          <div class="dropdown-group">
+            <div class="dropdown-group-title">Developer Tools</div>
+            <a href="#settings/api-keys" class="dropdown-item" data-route="settings/api-keys">
+              <span class="icon">🔑</span> API Keys
+            </a>
+            <a href="#settings/usage" class="dropdown-item" data-route="settings/usage">
+              <span class="icon">📊</span> Usage Dashboard
+            </a>
+            <button type="button" class="dropdown-item" id="openDocsButton">
+              <span class="icon">📖</span> Documentation
+            </button>
+            <button type="button" class="dropdown-item" id="openShortcutsButton">
+              <span class="icon">⌨️</span> Keyboard Shortcuts
+            </button>
+            <button type="button" class="dropdown-item" id="dropdownThemeToggle">
+              <span class="icon theme-icon">☀️</span> Switch Theme
+            </button>
+            <a href="#settings/preferences" class="dropdown-item" data-route="settings/preferences">
+              <span class="icon">⚙️</span> Settings & Preferences
+            </a>
+          </div>
+
+          <div class="dropdown-divider"></div>
+
+          <!-- 3. Account Actions Group -->
+          <div class="dropdown-group">
+            <button type="button" class="dropdown-item signout-item" id="logoutButton">
+              <span class="icon">🚪</span> Sign out
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONVERSATION WORKSPACE -->
+    <main class="main">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
+          <button id="mobileMenu" class="mobile-menu-btn" type="button" aria-label="Open navigation">☰</button>
+          <div class="crumb">
+            <span id="activeProjectLabel" class="hidden">Project / <strong id="projectNameLabel"></strong> · </span>
+            <strong id="conversationTitleLabel">New conversation</strong>
+          </div>
+          <div id="branchControl" class="branch-control hidden">
+            <span>🌿</span>
+            <select id="branchSelect" class="branch-select" aria-label="Select conversation branch"></select>
+            <button id="newBranchBtn" class="branch-btn" title="Create new branch from here" type="button">+</button>
+          </div>
+        </div>
+        <div class="topbar-actions" style="flex-wrap:wrap;gap:6px;">
+          <button id="telemetryBadge" class="telemetry-pill" type="button" title="View AI telemetry & token metrics">
+            ⏱️ <span id="telLatency">0</span>ms · <span id="telTokens">0</span> tok · <span id="telCost">$0.0000</span>
+          </button>
+          <button id="openContextBtn" class="pro-tool-btn" type="button" title="Pinned Context Drawer">📌 Context</button>
+          <button id="openCheckpointsBtn" class="pro-tool-btn" type="button" title="Conversation Timeline & Checkpoints">⏱️ Timeline</button>
+          <button id="openMultiModelBtn" class="pro-tool-btn" type="button" title="Compare Models">⚖️ Compare</button>
+          <button id="openShareBtn" class="pro-tool-btn" type="button" title="Share with Collaborators">👥 Share</button>
+          <select id="moveConversation" class="hidden" style="background:var(--surface-card);border:1px solid var(--surface-border);border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;"></select>
+          <button id="clearChat" class="secondary" style="padding:6px 12px;font-size:12.5px;">Clear</button>
+          <button id="appThemeToggle" class="theme-toggle" type="button" aria-label="Toggle theme">
+            <span class="theme-icon">☀️</span>
+          </button>
+        </div>
+      </header>
+
+      <section class="chat-container">
+        <div class="welcome-card" id="welcome">
+          <div class="eyebrow">
+            <span>⌘</span> CodeCompass Companion
+          </div>
+          <h1>Good code starts<br>with a clear compass.</h1>
+          <p>Untangle tricky errors, inspect unfamiliar architectures, and ship with confidence. What are we building or debugging today?</p>
+        </div>
+        <div class="chat" id="chat"></div>
+        <div class="suggestions" id="suggestions">
+          <button class="suggestion" data-prompt="What causes a NullPointerException in Java and how do I prevent it?">
+            <strong>Debug an error</strong>
+            <small>Inspect stack trace and root cause</small>
+          </button>
+          <button class="suggestion" data-prompt="Explain dependency injection and Bean lifecycles in Spring Boot.">
+            <strong>Understand a concept</strong>
+            <small>Clear technical breakdown & patterns</small>
+          </button>
+          <button class="suggestion" data-prompt="My Spring Boot REST API returns 404 or 401. How do I systematically trace it?">
+            <strong>Trace an API issue</strong>
+            <small>Step-by-step diagnostic guide</small>
+          </button>
+        </div>
+      </section>
+
+      <div class="composer-wrap">
+        <form class="composer" id="chatForm">
+          <textarea id="chatInput" maxlength="12000" placeholder="Ask a question, paste a stack trace, or share a code snippet… (Enter to send, Shift+Enter for new line)" rows="1"></textarea>
+          <div class="compose-bottom">
+            <span class="hint">Press <kbd class="inline-code">Ctrl+K</kbd> to search · <kbd class="inline-code">Ctrl+Shift+O</kbd> new chat</span>
+            <button class="send" id="sendButton" type="submit" aria-label="Send">↑</button>
+          </div>
+        </form>
+        <div class="footer-note">CodeCompass developer workspace · Powered by Google Gemini & offline reasoning fallback.</div>
+      </div>
+    </main>
+  </div>
+
+  <!-- DEDICATED DEVELOPER SETTINGS VIEW -->
+  <div id="settingsView" class="settings-view hidden">
+    <!-- SETTINGS SIDEBAR -->
+    <aside class="settings-sidebar">
+      <div class="settings-brand-header">
+        <a href="#chat" class="back-btn" id="backToChatBtn">← Back to Chat</a>
+        <div class="brand">
+          <div class="brand-mark">⌘</div>
+          <span class="brand-text"><em>Code</em>Compass</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim);font-weight:800;text-transform:uppercase;letter-spacing:0.8px;">
+          Workspace Settings
+        </div>
+      </div>
+
+      <nav class="settings-nav">
+        <a href="#settings/profile" class="settings-nav-item active" data-tab="profile">
+          <span class="icon">👤</span> Profile
+        </a>
+        <a href="#settings/api-keys" class="settings-nav-item" data-tab="api-keys">
+          <span class="icon">🔑</span> API Keys
+        </a>
+        <a href="#settings/security" class="settings-nav-item" data-tab="security">
+          <span class="icon">🛡️</span> Security
+        </a>
+        <a href="#settings/billing" class="settings-nav-item" data-tab="billing">
+          <span class="icon">💳</span> Billing
+        </a>
+        <a href="#settings/preferences" class="settings-nav-item" data-tab="preferences">
+          <span class="icon">⚙️</span> Preferences
+        </a>
+        <a href="#settings/usage" class="settings-nav-item" data-tab="usage">
+          <span class="icon">📊</span> Usage
+        </a>
+        <a href="#settings/danger" class="settings-nav-item danger-link" data-tab="danger">
+          <span class="icon">⚠️</span> Danger Zone
+        </a>
+      </nav>
+
+      <div style="padding-top:12px;border-top:1px solid var(--surface-border);display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:12px;color:var(--text-muted);" id="settingsThemeLabel">Theme</span>
+        <button id="settingsThemeToggle" class="theme-toggle" type="button" aria-label="Toggle theme">
+          <span class="theme-icon">☀️</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- SETTINGS CONTENT WRAPPER -->
+    <div class="settings-content-wrap">
+      <div class="settings-content">
+
+        <!-- ================= PROFILE SECTION ================= -->
+        <section id="settingsSection-profile" class="settings-section">
+          <div class="settings-header-banner">
+            <div>
+              <h1>Profile & Account</h1>
+              <p>Manage your developer identity, personal details, and account credentials.</p>
+            </div>
+            <span class="badge badge-success" id="profilePlanBadge">Free Developer Tier</span>
+          </div>
+
+          <div class="settings-card">
+            <div class="profile-hero">
+              <div class="hero-avatar" id="profileHeroAvatar">D</div>
+              <div class="hero-info">
+                <h3 id="profileHeroName">Developer</h3>
+                <div class="meta">
+                  <span id="profileHeroEmail">developer@codecompass.dev</span>
+                  <span>·</span>
+                  <span class="badge badge-success" id="profileVerifiedBadge">Verified Email</span>
+                  <span>·</span>
+                  <span id="profileJoinedDate">Joined recently</span>
+                </div>
+              </div>
+            </div>
+
+            <h2>Personal Information</h2>
+            <div class="settings-card-subtitle">Update your display name across conversations and projects.</div>
+            <form id="profileForm">
+              <div class="field">
+                <label for="settingsDisplayName">Display name</label>
+                <input id="settingsDisplayName" maxlength="100" required>
+              </div>
+              <div style="display:flex;justify-content:flex-end;">
+                <button class="primary" type="submit">Save Changes</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="settings-card">
+            <h2>Change Email Address</h2>
+            <div class="settings-card-subtitle">Update the email address associated with your CodeCompass account.</div>
+            <form id="changeEmailForm">
+              <div class="field">
+                <label for="newEmailInput">New email address</label>
+                <input id="newEmailInput" type="email" required placeholder="new-email@domain.com">
+              </div>
+              <div class="field">
+                <label for="changeEmailPassword">Current password for confirmation</label>
+                <input id="changeEmailPassword" type="password" required autocomplete="current-password" placeholder="••••••••">
+              </div>
+              <div style="display:flex;justify-content:flex-end;">
+                <button class="secondary" type="submit">Update Email</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- ================= API KEYS SECTION ================= -->
+        <section id="settingsSection-api-keys" class="settings-section hidden">
+          <div class="settings-header-banner">
+            <div>
+              <h1>Personal API Keys</h1>
+              <p>Programmatic API keys for interacting with CodeCompass from CLI tools, scripts, and workflows.</p>
+            </div>
+            <button class="primary" id="openCreateKeyModal">+ Generate New Key</button>
+          </div>
+
+          <div class="settings-card">
+            <h2>Authentication & Security</h2>
+            <p style="color:var(--text-muted);font-size:13.5px;line-height:1.5;margin-bottom:14px;">
+              Your personal API keys start with <code class="inline-code">cc_live_</code> and are hashed with SHA-256 before storage.
+              Pass them via the <code class="inline-code">X-API-Key: cc_live_...</code> or <code class="inline-code">Authorization: Bearer cc_live_...</code> header.
+              Never share your keys or commit them to public version control.
+            </p>
+
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Key Prefix</th>
+                    <th>Scopes</th>
+                    <th>Created</th>
+                    <th>Last Used</th>
+                    <th>Status</th>
+                    <th style="text-align:right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="apiKeysTableBody">
+                  <tr>
+                    <td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px;">Loading API keys…</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= SECURITY SECTION ================= -->
+        <section id="settingsSection-security" class="settings-section hidden">
+          <div class="settings-header-banner">
+            <div>
+              <h1>Security & Authentication</h1>
+              <p>Safeguard your developer account with robust password and session controls.</p>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <h2>Change Password</h2>
+            <div class="settings-card-subtitle">Ensure your account is protected with a secure password (6–18 characters).</div>
+            <form id="changePasswordSettingsForm">
+              <div class="field">
+                <label for="secCurrentPassword">Current password</label>
+                <input id="secCurrentPassword" type="password" required autocomplete="current-password" placeholder="••••••••">
+              </div>
+              <div class="field">
+                <label for="secNewPassword">New password</label>
+                <input id="secNewPassword" type="password" minlength="6" maxlength="18" required autocomplete="new-password" placeholder="••••••••">
+              </div>
+              <div style="display:flex;justify-content:flex-end;">
+                <button class="primary" type="submit">Update Password</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="settings-card">
+            <h2>Active Session & Protection</h2>
+            <div class="settings-card-subtitle">Details about your active browser session and encryption policies.</div>
+            <div style="display:flex;flex-direction:column;gap:12px;font-size:13.5px;">
+              <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--surface-border);padding-bottom:10px;">
+                <span style="color:var(--text-muted);">Session Type</span>
+                <strong>Stateful HTTP Session (HttpOnly, SameSite=Lax)</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--surface-border);padding-bottom:10px;">
+                <span style="color:var(--text-muted);">CSRF Protection</span>
+                <span class="badge badge-success">Active & Enforced</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--surface-border);padding-bottom:10px;">
+                <span style="color:var(--text-muted);">Idle Session Timeout</span>
+                <strong>30 Minutes</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--surface-border);padding-bottom:10px;">
+                <span style="color:var(--text-muted);">Email Verification</span>
+                <span class="badge badge-success" id="secEmailStatusBadge">Verified</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= BILLING SECTION ================= -->
+        <section id="settingsSection-billing" class="settings-section hidden">
+          <div class="settings-header-banner">
+            <div>
+              <h1>Billing & Workspaces</h1>
+              <p>Review your active subscription plan and resource quotas.</p>
+            </div>
+            <span class="badge badge-success">Active</span>
+          </div>
+
+          <div class="settings-card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+              <div>
+                <h2>Free Developer Tier</h2>
+                <div class="settings-card-subtitle">Your active local workspace plan.</div>
+              </div>
+              <span class="badge badge-success" style="font-size:12px;padding:4px 10px;">Current Plan</span>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0;font-size:13.5px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="color:var(--brand-compass);font-weight:bold;">✓</span> Unlimited local conversations & history
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="color:var(--brand-compass);font-weight:bold;">✓</span> Offline troubleshooting guidance fallback
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="color:var(--brand-compass);font-weight:bold;">✓</span> Google Gemini 2.5 Flash API connectivity
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="color:var(--brand-compass);font-weight:bold;">✓</span> Personal API keys for programmatic scripting
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="color:var(--brand-compass);font-weight:bold;">✓</span> Workspace projects with context memory
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="color:var(--brand-compass);font-weight:bold;">✓</span> Light and dark mode developer UI
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-card" style="border-style:dashed;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <h2>Team Workspaces & Managed Models</h2>
+                <p style="margin:4px 0 0;color:var(--text-muted);font-size:13.5px;">
+                  Shared project workspaces, team token pooling, and custom model routing are coming in a future release.
+                </p>
+              </div>
+              <span class="badge badge-warning">Coming Soon</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= PREFERENCES SECTION ================= -->
+        <section id="settingsSection-preferences" class="settings-section hidden">
+          <div class="settings-header-banner">
+            <div>
+              <h1>Developer Preferences</h1>
+              <p>Personalize your theme, response format, code styling, and programming environment.</p>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <h2>Interface Theme</h2>
+            <div class="settings-card-subtitle">Choose your preferred visual presentation.</div>
+            <div class="radio-cards" id="themeRadioCards">
+              <div class="radio-card active" data-theme-val="dark">
+                <strong>🌙 Dark Mode</strong>
+                <small>Deep emerald & slate tones for low-light coding.</small>
+              </div>
+              <div class="radio-card" data-theme-val="light">
+                <strong>☀️ Light Mode</strong>
+                <small>Crisp high-contrast surfaces with forest green accents.</small>
+              </div>
+              <div class="radio-card" data-theme-val="system">
+                <strong>💻 System Default</strong>
+                <small>Sync dynamically with your operating system preference.</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <h2>Code & Response Customization</h2>
+            <div class="settings-card-subtitle">Tailor how CodeCompass formats explanations and snippets.</div>
+            <form id="preferencesForm">
+              <div class="field">
+                <label for="prefLanguage">Preferred Primary Language</label>
+                <select id="prefLanguage">
+                  <option value="Java">Java</option>
+                  <option value="TypeScript">TypeScript / JavaScript</option>
+                  <option value="Python">Python</option>
+                  <option value="Go">Go</option>
+                  <option value="Rust">Rust</option>
+                  <option value="C++">C++</option>
+                  <option value="C#">C# / .NET</option>
+                  <option value="Kotlin">Kotlin</option>
+                  <option value="SQL">SQL</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="prefCodeStyle">AI Explanation Style</label>
+                <select id="prefCodeStyle">
+                  <option value="concise">Concise — Direct answers with essential code snippets</option>
+                  <option value="detailed">Detailed — In-depth architectural explanation</option>
+                  <option value="step-by-step">Step-by-Step — Guided walkthrough with checkpoints</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="prefFontSize">Editor & Code Font Size</label>
+                <select id="prefFontSize">
+                  <option value="small">Small (12px)</option>
+                  <option value="medium">Medium (13.5px — Default)</option>
+                  <option value="large">Large (15px)</option>
+                </select>
+              </div>
+
+              <div style="margin:16px 0;display:flex;align-items:center;gap:10px;">
+                <input id="prefLineNumbers" type="checkbox" checked style="width:18px;height:18px;cursor:pointer;">
+                <label for="prefLineNumbers" style="font-size:13.5px;font-weight:600;cursor:pointer;">
+                  Show line numbers on code snippet blocks
+                </label>
+              </div>
+
+              <div style="display:flex;justify-content:flex-end;">
+                <button class="primary" type="submit">Save Preferences</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- ================= USAGE SECTION ================= -->
+        <section id="settingsSection-usage" class="settings-section hidden">
+          <div class="settings-header-banner">
+            <div>
+              <h1>Usage & Analytics</h1>
+              <p>Real-time metrics tracking your CodeCompass AI prompts, tokens, and programmatic requests.</p>
+            </div>
+            <button class="secondary" id="refreshUsageBtn">↻ Refresh</button>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="label">Total Requests</span>
+              <span class="value" id="statTotalRequests">0</span>
+              <span class="desc">Prompts & queries sent</span>
+            </div>
+            <div class="stat-card">
+              <span class="label">Successful</span>
+              <span class="value" id="statSuccessRequests" style="color:var(--brand-compass);">0</span>
+              <span class="desc">Completed responses</span>
+            </div>
+            <div class="stat-card">
+              <span class="label">Estimated Tokens</span>
+              <span class="value" id="statTokens">0</span>
+              <span class="desc">Processed characters / 4</span>
+            </div>
+            <div class="stat-card">
+              <span class="label">API Key Calls</span>
+              <span class="value" id="statApiKeys">0</span>
+              <span class="desc">Programmatic requests</span>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <h2>7-Day Activity</h2>
+            <div class="settings-card-subtitle">Daily request volume over the last week.</div>
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Requests</th>
+                    <th>Tokens</th>
+                  </tr>
+                </thead>
+                <tbody id="dailyUsageTableBody">
+                  <tr>
+                    <td colspan="3" style="text-align:center;color:var(--text-muted);padding:18px;">No activity recorded for this period.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <h2>Recent Activity Events</h2>
+            <div class="settings-card-subtitle">Latest queries processed by CodeCompass.</div>
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Source</th>
+                    <th>Model</th>
+                    <th>Status</th>
+                    <th>Tokens</th>
+                    <th>Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody id="recentEventsTableBody">
+                  <tr>
+                    <td colspan="5" style="text-align:center;color:var(--text-muted);padding:18px;">No events yet. Start a chat to generate activity.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= DANGER ZONE SECTION ================= -->
+        <section id="settingsSection-danger" class="settings-section hidden">
+          <div class="settings-header-banner">
+            <div>
+              <h1 style="color:var(--danger);">Danger Zone</h1>
+              <p>Irreversible actions including session termination and permanent account deletion.</p>
+            </div>
+          </div>
+
+          <div class="danger-zone-card">
+            <h2>⚠️ Destructive Actions</h2>
+            <p>Please exercise caution. Deleted resources and keys cannot be recovered.</p>
+
+            <div class="danger-item">
+              <div class="danger-item-copy">
+                <strong>Sign Out from This Workspace</strong>
+                <small>Terminates your current browser session and clears security cookies.</small>
+              </div>
+              <button class="secondary" id="dangerSignOutBtn" type="button">Sign Out</button>
+            </div>
+
+            <div class="danger-item">
+              <div class="danger-item-copy">
+                <strong style="color:var(--danger);">Delete Account & Workspace Data</strong>
+                <small>Permanently deletes your profile, conversations, personal API keys, and projects.</small>
+              </div>
+              <button class="danger" id="openDeleteAccountModal" type="button">Delete Account</button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECT DIALOG -->
+  <dialog id="projectDialog" class="modal">
+    <form id="projectForm">
+      <h2 id="projectDialogTitle">New project</h2>
+      <p style="color:var(--text-muted);font-size:13.5px;margin:4px 0 16px;">Keep related development conversations together.</p>
+      <input type="hidden" id="projectId">
+      <div class="field">
+        <label for="projectName">Project name</label>
+        <input id="projectName" maxlength="120" required placeholder="e.g. Payment Gateway Service">
+      </div>
+      <div class="field">
+        <label for="projectDescription">Description</label>
+        <input id="projectDescription" maxlength="500" placeholder="Brief note on what this project is">
+      </div>
+      <div class="field">
+        <label for="projectInstructions">Project instructions</label>
+        <textarea id="projectInstructions" maxlength="4000" rows="3" placeholder="Context or rules CodeCompass should keep in mind for this project"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="danger hidden" id="deleteProjectButton">Delete project</button>
+        <span style="flex:1"></span>
+        <button type="button" class="secondary" data-close="projectDialog">Cancel</button>
+        <button class="primary" type="submit">Save project</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- CREATE API KEY DIALOG -->
+  <dialog id="createKeyDialog" class="modal">
+    <form id="createKeyForm">
+      <h2>Generate API Key</h2>
+      <p style="color:var(--text-muted);font-size:13px;margin:4px 0 16px;">
+        Create a secure key for programmatic CLI tools or automations.
+      </p>
+      <div class="field">
+        <label for="newKeyName">Key Name</label>
+        <input id="newKeyName" maxlength="100" required placeholder="e.g. Terminal CLI, Jenkins CI">
+      </div>
+      <div class="field">
+        <label for="newKeyScopes">Scopes</label>
+        <select id="newKeyScopes">
+          <option value="chat:write,conversations:read">Full Access (chat:write, conversations:read)</option>
+          <option value="chat:write">Chat Only (chat:write)</option>
+          <option value="conversations:read">Read Only (conversations:read)</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="secondary" data-close="createKeyDialog">Cancel</button>
+        <button class="primary" type="submit">Generate Key</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- API KEY REVEAL DIALOG -->
+  <dialog id="keyRevealDialog" class="modal">
+    <h2>Save Your API Key</h2>
+    <div class="notice warning" style="margin-top:12px;">
+      ⚠️ Make sure to copy your key now. For security reasons, you will not be able to view it again.
+    </div>
+    <div class="secret-box">
+      <span id="revealedSecretKey" style="color:var(--brand-compass);font-weight:bold;">cc_live_...</span>
+      <button class="secondary" id="copyKeyBtn" style="padding:4px 10px;font-size:12px;">Copy</button>
+    </div>
+    <div class="modal-actions">
+      <button class="primary" data-close="keyRevealDialog">I have copied my key</button>
+    </div>
+  </dialog>
+
+  <!-- DOCUMENTATION DIALOG -->
+  <dialog id="docsDialog" class="modal" style="max-width:640px;">
+    <h2>CodeCompass Documentation</h2>
+    <div style="max-height:60vh;overflow-y:auto;padding-right:6px;font-size:13.5px;color:var(--text);line-height:1.6;margin-top:12px;">
+      <h3 style="margin-top:0;">1. Programmatic API Access</h3>
+      <p>Send chat messages programmatically using your generated API key:</p>
+      <pre class="mono" style="background:var(--chat-code-bg);padding:10px;border-radius:6px;overflow-x:auto;">curl -X POST http://localhost:8080/api/chat \
+  -H "X-API-Key: cc_live_your_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"message":"How do I configure Spring Security?"}'</pre>
+
+      <h3>2. Local Offline Fallback</h3>
+      <p>
+        If <code class="inline-code">GEMINI_API_KEY</code> is not provided or when working offline, CodeCompass automatically falls back to built-in developer reasoning and diagnostic checklists without throwing blocking errors.
+      </p>
+
+      <h3>3. Project Memory</h3>
+      <p>
+        Attach conversations to Projects to automatically supply project-level instructions, libraries, and context to every AI prompt.
+      </p>
+    </div>
+    <div class="modal-actions">
+      <button class="primary" data-close="docsDialog">Close</button>
+    </div>
+  </dialog>
+
+  <!-- KEYBOARD SHORTCUTS DIALOG -->
+  <dialog id="shortcutsDialog" class="modal">
+    <h2>Keyboard Shortcuts</h2>
+    <p style="color:var(--text-muted);font-size:13px;margin:4px 0 16px;">Quick key bindings for maximum efficiency.</p>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Shortcut</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><kbd class="mono inline-code">Ctrl + K</kbd></td>
+            <td>Focus conversation search / Command palette</td>
+          </tr>
+          <tr>
+            <td><kbd class="mono inline-code">Ctrl + Shift + O</kbd></td>
+            <td>Start new conversation</td>
+          </tr>
+          <tr>
+            <td><kbd class="mono inline-code">Esc</kbd></td>
+            <td>Close active modal, dropdown, or return to chat</td>
+          </tr>
+          <tr>
+            <td><kbd class="mono inline-code">Enter</kbd></td>
+            <td>Send message in composer</td>
+          </tr>
+          <tr>
+            <td><kbd class="mono inline-code">Shift + Enter</kbd></td>
+            <td>Insert line break in composer</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-actions">
+      <button class="primary" data-close="shortcutsDialog">Got it</button>
+    </div>
+  </dialog>
+
+  <!-- ACCOUNT DELETION CONFIRMATION DIALOG -->
+  <dialog id="deleteAccountDialog" class="modal">
+    <form id="deleteAccountForm">
+      <h2 style="color:var(--danger);">Permanently Delete Account</h2>
+      <div class="notice error" style="margin-top:12px;">
+        ⚠️ This action cannot be undone. All your projects, conversations, messages, and API keys will be immediately destroyed.
+      </div>
+      <p style="color:var(--text-muted);font-size:13px;margin:12px 0 8px;">
+        Type <strong style="color:var(--text);">DELETE</strong> or your email to confirm:
+      </p>
+      <div class="field">
+        <input id="deleteConfirmationInput" required placeholder="Type DELETE or your email">
+      </div>
+      <div class="field">
+        <label for="deleteAccountPassword">Confirm your current password</label>
+        <input id="deleteAccountPassword" type="password" required autocomplete="current-password" placeholder="••••••••">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="secondary" data-close="deleteAccountDialog">Cancel</button>
+        <button class="danger" type="submit">Permanently Delete</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- CODECOMPASS PRO WORKSPACE MODALS -->
+
+  <!-- 1. SPOTLIGHT COMMAND PALETTE -->
+  <dialog id="commandPaletteDialog" class="modal palette-modal">
+    <div class="palette-header">
+      <span class="palette-icon">⌘</span>
+      <input id="paletteInput" class="palette-input" type="text" placeholder="Type a command or search workspace... (↑↓ to navigate, Enter to select)" autocomplete="off">
+      <kbd class="palette-badge">ESC</kbd>
+    </div>
+    <div id="paletteResults" class="palette-results"></div>
+  </dialog>
+
+  <!-- 2. CONVERSATION CONTEXT & PINNED SNIPPETS DRAWER -->
+  <dialog id="contextDrawer" class="modal wide-modal">
+    <div class="modal-header">
+      <h2>📌 Conversation Context & Pinned Snippets</h2>
+      <button class="icon-btn" data-close="contextDrawer" type="button">✕</button>
+    </div>
+    <p style="color:var(--text-muted);font-size:13px;margin:0 0 14px;">
+      Pin schemas, project rules, or key source files to persist active developer context in this workspace.
+    </p>
+    <form id="addContextForm" style="margin-bottom:18px;">
+      <div style="display:grid;grid-template-columns:1fr 140px;gap:8px;">
+        <input id="ctxName" placeholder="Context label (e.g. UserEntity.java or Spring Security Rule)" required>
+        <select id="ctxType" style="background:var(--surface-card);border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:8px 10px;font-size:13px;color:var(--text);">
+          <option value="file">Source File</option>
+          <option value="snippet">Code Snippet</option>
+          <option value="rule">Rule / Arch</option>
+          <option value="doc">Documentation</option>
+        </select>
+      </div>
+      <textarea id="ctxContent" placeholder="Paste context content, API definitions, or schema snippets here..." rows="4" style="width:100%;margin-top:8px;background:var(--surface-card);border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:10px;color:var(--text);font-family:var(--font-mono);font-size:12.5px;resize:vertical;" required></textarea>
+      <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+        <button class="primary" type="submit">+ Pin to Workspace Context</button>
+      </div>
+    </form>
+    <div class="section-title"><span>Pinned Workspace Items</span></div>
+    <div id="contextItemsList" class="drawer-list"></div>
+    <div class="modal-actions">
+      <button class="secondary" data-close="contextDrawer" type="button">Close</button>
+    </div>
+  </dialog>
+
+  <!-- 3. STATIC AST SYNTAX VISUALIZER -->
+  <dialog id="astModal" class="modal wide-modal">
+    <div class="modal-header">
+      <h2>🔍 Java Static AST Decomposition</h2>
+      <button class="icon-btn" data-close="astModal" type="button">✕</button>
+    </div>
+    <p style="color:var(--text-muted);font-size:13px;margin:0 0 12px;">
+      Structural abstract syntax tree breakdown including classes, interfaces, methods, and control blocks.
+    </p>
+    <div id="astTreeContainer" class="ast-tree-container"></div>
+    <div class="modal-actions">
+      <button class="primary" data-close="astModal" type="button">Close Inspector</button>
+    </div>
+  </dialog>
+
+  <!-- 4. INLINE DIFF & PATCH VIEWER -->
+  <dialog id="diffModal" class="modal wide-modal">
+    <div class="modal-header">
+      <h2>⚖️ Unified Diff & Patch Viewer</h2>
+      <button class="icon-btn" data-close="diffModal" type="button">✕</button>
+    </div>
+    <div class="diff-stats" id="diffStats">
+      <span class="badge badge-success" id="diffAddedBadge">+0 lines</span>
+      <span class="badge badge-danger" id="diffDeletedBadge">-0 lines</span>
+    </div>
+    <div id="diffLinesContainer" class="diff-container"></div>
+    <div class="modal-actions" style="justify-content:space-between;">
+      <button class="secondary" id="copyPatchBtn" type="button">Copy Unified Patch</button>
+      <button class="primary" data-close="diffModal" type="button">Close</button>
+    </div>
+  </dialog>
+
+  <!-- 5. MULTI-MODEL SIDE-BY-SIDE COMPARISON -->
+  <dialog id="multiModelModal" class="modal wide-modal">
+    <div class="modal-header">
+      <h2>⚖️ Multi-Model Side-by-Side Comparison</h2>
+      <button class="icon-btn" data-close="multiModelModal" type="button">✕</button>
+    </div>
+    <p style="color:var(--text-muted);font-size:13px;margin:0 0 14px;">
+      Simultaneously query and compare responses, token economics, and latencies across models.
+    </p>
+    <form id="multiModelForm" style="margin-bottom:14px;">
+      <div style="display:flex;gap:8px;">
+        <input id="multiModelPrompt" placeholder="Ask both models (e.g. Compare records vs classes in modern Java)..." style="flex:1;background:var(--surface-card);border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:10px 14px;color:var(--text);" required>
+        <button class="primary" type="submit" id="multiModelSubmitBtn">Benchmark</button>
+      </div>
+    </form>
+    <div id="multiModelResults" class="multi-model-grid"></div>
+    <div class="modal-actions">
+      <button class="secondary" data-close="multiModelModal" type="button">Close</button>
+    </div>
+  </dialog>
+
+  <!-- 6. TIMELINE & CHECKPOINTS MODAL -->
+  <dialog id="checkpointsModal" class="modal">
+    <div class="modal-header">
+      <h2>⏱️ Conversation Checkpoints & Timeline</h2>
+      <button class="icon-btn" data-close="checkpointsModal" type="button">✕</button>
+    </div>
+    <p style="color:var(--text-muted);font-size:13px;margin:0 0 12px;">
+      Save and snapshot milestone points in your architectural inquiry.
+    </p>
+    <form id="createCheckpointForm" style="margin-bottom:16px;">
+      <div class="field">
+        <label for="chkTitle">Checkpoint Title</label>
+        <input id="chkTitle" placeholder="e.g. Working API Controller Setup" required>
+      </div>
+      <div class="field">
+        <label for="chkDesc">Description (optional)</label>
+        <input id="chkDesc" placeholder="e.g. Before implementing token auth">
+      </div>
+      <div style="display:flex;justify-content:flex-end;">
+        <button class="primary" type="submit">+ Save Checkpoint</button>
+      </div>
+    </form>
+    <div class="section-title"><span>Checkpoint Milestones</span></div>
+    <div id="checkpointsList" class="drawer-list"></div>
+    <div class="modal-actions">
+      <button class="secondary" data-close="checkpointsModal" type="button">Close</button>
+    </div>
+  </dialog>
+
+  <!-- 7. COLLABORATE & SHARE MODAL -->
+  <dialog id="shareModal" class="modal">
+    <div class="modal-header">
+      <h2>👥 Share Workspace & Collaboration</h2>
+      <button class="icon-btn" data-close="shareModal" type="button">✕</button>
+    </div>
+    <p style="color:var(--text-muted);font-size:13px;margin:0 0 14px;">
+      Invite engineering teammates to review or collaborate on this conversation.
+    </p>
+    <form id="inviteCollaboratorForm" style="margin-bottom:16px;">
+      <div style="display:grid;grid-template-columns:1fr 110px auto;gap:8px;">
+        <input id="collabEmail" type="email" placeholder="teammate@company.com" required>
+        <select id="collabRole" style="background:var(--surface-card);border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:8px 10px;font-size:13px;color:var(--text);">
+          <option value="VIEWER">Viewer</option>
+          <option value="EDITOR">Editor</option>
+        </select>
+        <button class="primary" type="submit">Invite</button>
+      </div>
+    </form>
+    <div class="section-title"><span>Active Collaborators</span></div>
+    <div id="collaboratorsList" class="drawer-list"></div>
+    <div class="modal-actions">
+      <button class="secondary" data-close="shareModal" type="button">Done</button>
+    </div>
+  </dialog>
+
+  <!-- 8. TELEMETRY POPOVER MODAL -->
+  <dialog id="telemetryModal" class="modal">
+    <div class="modal-header">
+      <h2>⚡ AI Telemetry & Token Metrics</h2>
+      <button class="icon-btn" data-close="telemetryModal" type="button">✕</button>
+    </div>
+    <div class="table-container" style="margin:16px 0;">
+      <table class="data-table">
+        <tbody>
+          <tr><td><strong>Roundtrip Latency</strong></td><td id="telModalLatency" class="mono">-- ms</td></tr>
+          <tr><td><strong>Prompt Tokens (Input)</strong></td><td id="telModalPromptTokens" class="mono">--</td></tr>
+          <tr><td><strong>Completion Tokens (Output)</strong></td><td id="telModalCompletionTokens" class="mono">--</td></tr>
+          <tr><td><strong>Total Tokens</strong></td><td id="telModalTotalTokens" class="mono">--</td></tr>
+          <tr><td><strong>Estimated Cost (USD)</strong></td><td id="telModalCost" class="mono" style="color:var(--brand-compass);font-weight:700;">$--</td></tr>
+          <tr><td><strong>Active Model</strong></td><td id="telModalModel" class="mono">gemini-2.5-flash / fallback</td></tr>
+          <tr><td><strong>Database Backend</strong></td><td id="telModalBackend" class="mono">Supabase PostgreSQL Pooler</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-actions">
+      <button class="primary" data-close="telemetryModal" type="button">Close</button>
+    </div>
+  </dialog>
+
+  <!-- 9. BRANCH CREATION MODAL -->
+  <dialog id="branchModal" class="modal">
+    <div class="modal-header">
+      <h2>🌿 Fork Conversation Branch</h2>
+      <button class="icon-btn" data-close="branchModal" type="button">✕</button>
+    </div>
+    <p style="color:var(--text-muted);font-size:13px;margin:0 0 14px;">
+      Explore an alternative solution branch without losing the original conversation context.
+    </p>
+    <form id="createBranchForm">
+      <div class="field">
+        <label for="branchNameInput">Branch Name</label>
+        <input id="branchNameInput" placeholder="e.g. spring-security-v7-migration" required>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="secondary" data-close="branchModal">Cancel</button>
+        <button class="primary" type="submit">Fork Branch</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="notice hidden" style="position:fixed;right:20px;bottom:20px;max-width:380px;z-index:99;box-shadow:0 12px 32px rgba(0,0,0,0.7);" role="status"></div>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    const $ = id => document.getElementById(id);
+    let csrfToken = '', currentUser = null, userPreferences = null;
+    let projects = [], conversations = [], activeProjectId = null, activeConversationId = null;
+    let authMode = 'login', toastTimer = null, isSending = false;
+
+    // THEME ENGINE
+    function getStoredTheme() {
+      return localStorage.getItem('codecompass-theme') ||
+             (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    }
+
+    function applyTheme(theme) {
+      const resolved = theme === 'system'
+        ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+        : theme;
+
+      document.documentElement.setAttribute('data-theme', resolved);
+      localStorage.setItem('codecompass-theme', theme);
+
+      const isDark = resolved === 'dark';
+      document.querySelectorAll('.theme-icon').forEach(icon => {
+        icon.textContent = isDark ? '☀️' : '🌙';
+      });
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', isDark ? '#0b100e' : '#f7faf7');
+
+      document.querySelectorAll('#themeRadioCards .radio-card').forEach(card => {
+        card.classList.toggle('active', card.dataset.themeVal === theme);
+      });
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      const target = current === 'dark' ? 'light' : 'dark';
+      applyTheme(target);
+      if (currentUser) {
+        api('/api/settings/preferences', {method:'PATCH', body:JSON.stringify({theme:target})}).catch(()=>{});
+      }
+    }
+
+    applyTheme(getStoredTheme());
+    $('authThemeToggle').onclick = toggleTheme;
+    $('appThemeToggle').onclick = toggleTheme;
+    $('settingsThemeToggle').onclick = toggleTheme;
+    $('dropdownThemeToggle').onclick = () => { toggleDropdown(false); toggleTheme(); };
+
+    // CSRF & API WRAPPER
+    async function csrf() {
+      const response = await fetch('/api/auth/csrf', {credentials:'same-origin'});
+      if (!response.ok) throw new Error('Could not initialize security context. Refresh and retry.');
+      csrfToken = (await response.json()).token;
+    }
+
+    async function api(url, options = {}) {
+      const method = (options.method || 'GET').toUpperCase();
+      const headers = new Headers(options.headers || {});
+      if (options.body && !headers.has('Content-Type')) headers.set('Content-Type','application/json');
+      if (!['GET','HEAD','OPTIONS','TRACE'].includes(method)) {
+        if (!csrfToken) await csrf();
+        headers.set('X-XSRF-TOKEN', csrfToken);
+      }
+      const response = await fetch(url, {...options, method, headers, credentials:'same-origin'});
+      const data = response.status === 204 ? null : await response.json().catch(()=>null);
+      if (!response.ok) {
+        if (response.status === 401 && !url.startsWith('/api/auth/')) {
+          showAuth('login', 'Your session has ended. Please sign in again.');
+        }
+        throw new Error(data?.error || `Request failed (${response.status}).`);
+      }
+      return data;
+    }
+
+    function toast(message, error=false) {
+      const el = $('toast');
+      el.textContent = message;
+      el.classList.remove('hidden','error');
+      if (error) el.classList.add('error');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.add('hidden'), 4500);
+    }
+
+    // AUTH SWITCHER
+    function showAuth(mode='login', message='') {
+      authMode = mode;
+      $('authScreen').classList.remove('hidden');
+      $('appShell').classList.add('hidden');
+      $('settingsView').classList.add('hidden');
+      $('authNotice').classList.toggle('hidden', !message);
+      $('authNotice').classList.remove('error');
+      $('authNotice').textContent = message;
+
+      ['loginForm','registerForm','forgotForm','resendForm','resetForm'].forEach(id => {
+        $(id).classList.toggle('hidden', id !== mode + 'Form');
+      });
+    }
+
+    // ROUTING & VIEW NAVIGATION
+    function handleRoute() {
+      const hash = window.location.hash || '';
+      if (!currentUser) return;
+
+      if (hash.startsWith('#settings')) {
+        $('appShell').classList.add('hidden');
+        $('settingsView').classList.remove('hidden');
+        closeMobileSidebar();
+        toggleDropdown(false);
+
+        const tab = hash.split('/')[1] || 'profile';
+        activateSettingsTab(tab);
+      } else {
+        $('settingsView').classList.add('hidden');
+        $('appShell').classList.remove('hidden');
+      }
+    }
+
+    window.addEventListener('hashchange', handleRoute);
+    window.addEventListener('popstate', handleRoute);
+
+    function activateSettingsTab(tabName) {
+      const validTabs = ['profile', 'api-keys', 'security', 'billing', 'preferences', 'usage', 'danger'];
+      const active = validTabs.includes(tabName) ? tabName : 'profile';
+
+      document.querySelectorAll('.settings-nav-item').forEach(el => {
+        el.classList.toggle('active', el.dataset.tab === active);
+      });
+
+      document.querySelectorAll('.settings-section').forEach(sec => {
+        sec.classList.toggle('hidden', sec.id !== `settingsSection-${active}`);
+      });
+
+      if (active === 'profile') loadProfileSection();
+      else if (active === 'api-keys') loadApiKeysSection();
+      else if (active === 'preferences') loadPreferencesSection();
+      else if (active === 'usage') loadUsageSection();
+      else if (active === 'security') loadSecuritySection();
+    }
+
+    // DROPDOWN HANDLING — Compact, Click-Outside, and Esc-to-Close
+    function toggleDropdown(forceState = null) {
+      const el = $('accountDropdown');
+      const shouldOpen = forceState !== null ? forceState : el.classList.contains('hidden');
+      el.classList.toggle('hidden', !shouldOpen);
+      $('accountButton').setAttribute('aria-expanded', shouldOpen);
+    }
+
+    $('accountButton').onclick = (e) => {
+      e.stopPropagation();
+      toggleDropdown();
+    };
+
+    document.addEventListener('click', (e) => {
+      if (!$('accountDropdown').contains(e.target) && !$('accountButton').contains(e.target)) {
+        toggleDropdown(false);
+      }
+    });
+
+    // MOBILE SIDEBAR
+    function closeMobileSidebar() {
+      $('sidebar').classList.remove('mobile-open');
+      $('sidebarBackdrop').classList.remove('open');
+    }
+    $('mobileMenu').onclick = () => {
+      $('sidebar').classList.add('mobile-open');
+      $('sidebarBackdrop').classList.add('open');
+    };
+    $('sidebarBackdrop').onclick = closeMobileSidebar;
+
+    // KEYBOARD SHORTCUTS
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('dialog[open]').forEach(d => d.close());
+        toggleDropdown(false);
+        closeMobileSidebar();
+        if (window.location.hash.startsWith('#settings')) {
+          window.location.hash = '#chat';
+        }
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        openCommandPalette();
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'o') {
+        e.preventDefault();
+        if (!window.location.hash.startsWith('#settings')) {
+          newChat();
+        }
+      }
+    });
+
+    $('openShortcutsButton').onclick = () => { toggleDropdown(false); $('shortcutsDialog').showModal(); };
+    $('conversationSearch').onclick = (e) => {
+      if (window.innerWidth <= 768) {
+        // on mobile, let normal input work or open palette
+      }
+    };
+
+    $('openDocsButton').onclick = () => { toggleDropdown(false); $('docsDialog').showModal(); };
+    $('openShortcutsButton').onclick = () => { toggleDropdown(false); $('shortcutsDialog').showModal(); };
+
+    // ==========================================================
+    // SETTINGS SECTIONS DATA MANAGERS
+    // ==========================================================
+
+    async function loadProfileSection() {
+      try {
+        const profile = await api('/api/settings/profile');
+        currentUser = profile;
+        renderAccount();
+
+        $('profileHeroName').textContent = profile.name;
+        $('profileHeroEmail').textContent = profile.email;
+        $('profileHeroAvatar').textContent = (profile.name || profile.email || 'D').charAt(0).toUpperCase();
+        $('settingsDisplayName').value = profile.name;
+        $('profileVerifiedBadge').textContent = profile.enabled ? 'Verified Email' : 'Unverified Email';
+        $('profileVerifiedBadge').className = profile.enabled ? 'badge badge-success' : 'badge badge-warning';
+        $('profileJoinedDate').textContent = profile.createdAt
+          ? `Member since ${new Date(profile.createdAt).toLocaleDateString()}`
+          : 'Active Developer';
+      } catch (err) {
+        toast(err.message, true);
+      }
+    }
+
+    $('profileForm').onsubmit = async (e) => {
+      e.preventDefault();
+      try {
+        const updated = await api('/api/settings/profile', {
+          method: 'PATCH',
+          body: JSON.stringify({name: $('settingsDisplayName').value.trim()})
+        });
+        currentUser = updated;
+        renderAccount();
+        $('profileHeroName').textContent = updated.name;
+        toast('Profile updated successfully.');
+      } catch (err) {
+        toast(err.message, true);
+      }
+    };
+
+    $('changeEmailForm').onsubmit = async (e) => {
+      e.preventDefault();
+      try {
+        const updated = await api('/api/settings/change-email', {
+          method: 'POST',
+          body: JSON.stringify({
+            newEmail: $('newEmailInput').value.trim(),
+            currentPassword: $('changeEmailPassword').value
+          })
+        });
+        currentUser = updated;
+        renderAccount();
+        $('changeEmailForm').reset();
+        toast('Email updated successfully.');
+        loadProfileSection();
+      } catch (err) {
+        toast(err.message, true);
+      }
+    };
+
+    // API KEYS
+    async function loadApiKeysSection() {
+      const tbody = $('apiKeysTableBody');
+      try {
+        const keys = await api('/api/settings/api-keys');
+        if (!keys || keys.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px;">No personal API keys generated yet. Click "+ Generate New Key" above.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = keys.map(k => `
+          <tr>
+            <td><strong>${escapeHtml(k.name)}</strong></td>
+            <td><code class="inline-code">${escapeHtml(k.keyPrefix)}</code></td>
+            <td><span class="badge badge-muted">${escapeHtml(k.scopes)}</span></td>
+            <td>${new Date(k.createdAt).toLocaleDateString()}</td>
+            <td>${k.lastUsedAt ? new Date(k.lastUsedAt).toLocaleDateString() : '<span style="color:var(--text-dim);">Never</span>'}</td>
+            <td>
+              <span class="badge ${k.revoked ? 'badge-danger' : 'badge-success'}">
+                ${k.revoked ? 'Revoked' : 'Active'}
+              </span>
+            </td>
+            <td style="text-align:right;">
+              ${k.revoked ? '<span style="color:var(--text-dim);font-size:12px;">Revoked</span>' : `
+                <button class="danger" style="padding:4px 8px;font-size:12px;" onclick="revokeKey('${k.id}', '${escapeHtml(k.name)}')">
+                  Revoke
+                </button>
+              `}
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" style="color:var(--danger);text-align:center;padding:16px;">Failed to load API keys: ${escapeHtml(err.message)}</td></tr>`;
+      }
+    }
+
+    $('openCreateKeyModal').onclick = () => {
+      $('createKeyForm').reset();
+      $('createKeyDialog').showModal();
+    };
+
+    $('createKeyForm').onsubmit = async (e) => {
+      e.preventDefault();
+      try {
+        const res = await api('/api/settings/api-keys', {
+          method: 'POST',
+          body: JSON.stringify({
+            name: $('newKeyName').value.trim(),
+            scopes: $('newKeyScopes').value
+          })
+        });
+        $('createKeyDialog').close();
+        $('revealedSecretKey').textContent = res.secretKey;
+        $('keyRevealDialog').showModal();
+        loadApiKeysSection();
+      } catch (err) {
+        toast(err.message, true);
+      }
+    };
+
+    $('copyKeyBtn').onclick = () => {
+      const secret = $('revealedSecretKey').textContent;
+      navigator.clipboard.writeText(secret).then(() => {
+        $('copyKeyBtn').textContent = 'Copied!';
+        setTimeout(() => $('copyKeyBtn').textContent = 'Copy', 2000);
+      });
+    };
+
+    async function revokeKey(keyId, keyName) {
+      if (!confirm(`Are you sure you want to revoke the key "${keyName}"? Any scripts or tools using it will immediately stop working.`)) return;
+      try {
+        await api(`/api/settings/api-keys/${keyId}`, {method:'DELETE'});
+        toast(`Key "${keyName}" revoked.`);
+        loadApiKeysSection();
+      } catch (err) {
+        toast(err.message, true);
+      }
+    }
+
+    // SECURITY SECTION
+    function loadSecuritySection() {
+      $('secEmailStatusBadge').textContent = currentUser?.enabled ? 'Verified' : 'Unverified';
+      $('secEmailStatusBadge').className = currentUser?.enabled ? 'badge badge-success' : 'badge badge-warning';
+    }
+
+    $('changePasswordSettingsForm').onsubmit = async (e) => {
+      e.preventDefault();
+      try {
+        await api('/api/auth/change-password', {
+          method: 'POST',
+          body: JSON.stringify({
+            currentPassword: $('secCurrentPassword').value,
+            newPassword: $('secNewPassword').value
+          })
+        });
+        $('changePasswordSettingsForm').reset();
+        toast('Password updated successfully.');
+      } catch (err) {
+        toast(err.message, true);
+      }
+    };
+
+    // PREFERENCES SECTION
+    async function loadPreferencesSection() {
+      try {
+        const pref = await api('/api/settings/preferences');
+        userPreferences = pref;
+        $('prefLanguage').value = pref.preferredLanguage || 'Java';
+        $('prefCodeStyle').value = pref.codeStyle || 'concise';
+        $('prefFontSize').value = pref.fontSize || 'medium';
+        $('prefLineNumbers').checked = pref.lineNumbers !== false;
+
+        document.querySelectorAll('#themeRadioCards .radio-card').forEach(card => {
+          card.classList.toggle('active', card.dataset.themeVal === pref.theme);
+        });
+      } catch (err) {
+        toast(err.message, true);
+      }
+    }
+
+    document.querySelectorAll('#themeRadioCards .radio-card').forEach(card => {
+      card.onclick = () => {
+        const theme = card.dataset.themeVal;
+        applyTheme(theme);
+        api('/api/settings/preferences', {method:'PATCH', body:JSON.stringify({theme})}).catch(()=>{});
+      };
+    });
+
+    $('preferencesForm').onsubmit = async (e) => {
+      e.preventDefault();
+      try {
+        const payload = {
+          preferredLanguage: $('prefLanguage').value,
+          codeStyle: $('prefCodeStyle').value,
+          fontSize: $('prefFontSize').value,
+          lineNumbers: $('prefLineNumbers').checked
+        };
+        const updated = await api('/api/settings/preferences', {
+          method: 'PATCH',
+          body: JSON.stringify(payload)
+        });
+        userPreferences = updated;
+        toast('Preferences saved.');
+      } catch (err) {
+        toast(err.message, true);
+      }
+    };
+
+    // USAGE SECTION
+    async function loadUsageSection() {
+      try {
+        const usage = await api('/api/settings/usage');
+        $('statTotalRequests').textContent = usage.totalRequests.toLocaleString();
+        $('statSuccessRequests').textContent = usage.successfulRequests.toLocaleString();
+        $('statTokens').textContent = usage.totalTokens.toLocaleString();
+        $('statApiKeys').textContent = usage.apiKeyRequests.toLocaleString();
+
+        const dailyBody = $('dailyUsageTableBody');
+        if (usage.dailyUsage && usage.dailyUsage.length > 0) {
+          dailyBody.innerHTML = usage.dailyUsage.map(d => `
+            <tr>
+              <td><strong class="mono">${d.date}</strong></td>
+              <td>${d.requestCount} requests</td>
+              <td>${d.totalTokens.toLocaleString()} tokens</td>
+            </tr>
+          `).join('');
+        } else {
+          dailyBody.innerHTML = `<tr><td colspan="3" style="text-align:center;color:var(--text-muted);padding:18px;">No usage in the past 7 days.</td></tr>`;
+        }
+
+        const eventsBody = $('recentEventsTableBody');
+        if (usage.recentEvents && usage.recentEvents.length > 0) {
+          eventsBody.innerHTML = usage.recentEvents.map(ev => `
+            <tr>
+              <td><span class="badge ${ev.source === 'API_KEY' ? 'badge-warning' : 'badge-success'}">${ev.source}</span></td>
+              <td><code class="inline-code">${ev.modelName}</code></td>
+              <td><span class="badge ${ev.status === 'SUCCESS' ? 'badge-success' : 'badge-danger'}">${ev.status}</span></td>
+              <td class="mono">${ev.totalTokens}</td>
+              <td style="color:var(--text-muted);font-size:12px;">${new Date(ev.createdAt).toLocaleTimeString()}</td>
+            </tr>
+          `).join('');
+        } else {
+          eventsBody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:18px;">No events recorded yet.</td></tr>`;
+        }
+      } catch (err) {
+        toast(err.message, true);
+      }
+    }
+
+    $('refreshUsageBtn').onclick = loadUsageSection;
+
+    // DANGER ZONE
+    $('dangerSignOutBtn').onclick = () => $('logoutButton').click();
+
+    $('openDeleteAccountModal').onclick = () => {
+      $('deleteAccountForm').reset();
+      $('deleteAccountDialog').showModal();
+    };
+
+    $('deleteAccountForm').onsubmit = async (e) => {
+      e.preventDefault();
+      try {
+        await api('/api/settings/account', {
+          method: 'DELETE',
+          body: JSON.stringify({
+            confirmation: $('deleteConfirmationInput').value.trim(),
+            currentPassword: $('deleteAccountPassword').value
+          })
+        });
+        $('deleteAccountDialog').close();
+        currentUser = null;
+        csrfToken = '';
+        showAuth('login', 'Your account and workspace data have been permanently removed.');
+        await csrf();
+      } catch (err) {
+        toast(err.message, true);
+      }
+    };
+
+    // ==========================================================
+    // MAIN CHAT APPLICATION LOGIC
+    // ==========================================================
+
+    function renderAccount() {
+      if (!currentUser) return;
+      const initial = (currentUser.name || currentUser.email || 'D').charAt(0).toUpperCase();
+      $('userAvatar').textContent = initial;
+      $('dropdownAvatar').textContent = initial;
+      $('userName').textContent = currentUser.name || 'Developer';
+      $('userEmail').textContent = currentUser.email || '';
+      $('dropdownUserName').textContent = currentUser.name || 'Developer';
+      $('dropdownUserEmail').textContent = currentUser.email || '';
+    }
+
+    async function loadProjects() {
+      projects = await api('/api/projects');
+      renderProjects();
+    }
+
+    function renderProjects() {
+      const box = $('projects');
+      box.replaceChildren();
+
+      const all = document.createElement('button');
+      all.className = `project-pill ${activeProjectId === null ? 'active' : ''}`;
+      all.textContent = 'All';
+      all.onclick = () => selectProject(null);
+      box.appendChild(all);
+
+      projects.forEach(p => {
+        const btn = document.createElement('button');
+        btn.className = `project-pill ${activeProjectId === p.id ? 'active' : ''}`;
+        btn.textContent = p.name;
+        btn.title = p.description || p.name;
+        btn.onclick = () => selectProject(p.id);
+        box.appendChild(btn);
+      });
+    }
+
+    async function selectProject(id) {
+      activeProjectId = id;
+      renderProjects();
+      renderMoveOptions();
+      updateProjectLabels();
+      await loadConversations($('conversationSearch').value.trim());
+      if (activeConversationId) {
+        const conv = conversations.find(c => c.id === activeConversationId);
+        if (conv && conv.projectId !== activeProjectId && activeProjectId !== null) {
+          newChat();
+        }
+      }
+    }
+
+    function updateProjectLabels() {
+      const p = projects.find(item => item.id === activeProjectId);
+      if (p) {
+        $('activeProjectLabel').classList.remove('hidden');
+        $('projectNameLabel').textContent = p.name;
+      } else {
+        $('activeProjectLabel').classList.add('hidden');
+      }
+    }
+
+    async function loadConversations(query = '') {
+      let url = '/api/conversations';
+      const params = new URLSearchParams();
+      if (activeProjectId) params.set('projectId', activeProjectId);
+      if (query) params.set('q', query);
+      const qs = params.toString();
+      if (qs) url += '?' + qs;
+
+      conversations = await api(url);
+      renderConversations();
+    }
+
+    function renderConversations() {
+      const box = $('conversations');
+      box.replaceChildren();
+
+      if (conversations.length === 0) {
+        const empty = document.createElement('div');
+        empty.style.color = 'var(--text-dim)';
+        empty.style.fontSize = '12px';
+        empty.style.padding = '8px 10px';
+        empty.textContent = 'No conversations saved.';
+        box.appendChild(empty);
+        return;
+      }
+
+      conversations.forEach(c => {
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.alignItems = 'center';
+        row.style.gap = '4px';
+
+        const btn = document.createElement('button');
+        btn.className = `list-item ${activeConversationId === c.id ? 'active' : ''}`;
+        btn.style.flex = '1';
+        btn.textContent = c.title || 'Untitled chat';
+        btn.onclick = () => { closeMobileSidebar(); selectConversation(c.id); };
+
+        const menuBtn = document.createElement('button');
+        menuBtn.className = 'row-menu';
+        menuBtn.innerHTML = '⋮';
+        menuBtn.title = 'Conversation options';
+        menuBtn.onclick = (e) => {
+          e.stopPropagation();
+          const action = prompt(`Conversation: "${c.title}"\nType 'rename' or 'delete':`);
+          if (action === 'rename') {
+            const next = prompt('New title:', c.title);
+            if (next && next.trim()) {
+              api(`/api/conversations/${c.id}`, {method:'PATCH', body:JSON.stringify({title:next.trim()})})
+                .then(loadConversations).catch(err=>toast(err.message,true));
+            }
+          } else if (action === 'delete') {
+            if (confirm(`Delete "${c.title}"?`)) {
+              api(`/api/conversations/${c.id}`, {method:'DELETE'})
+                .then(() => {
+                  if (activeConversationId === c.id) newChat();
+                  loadConversations();
+                }).catch(err=>toast(err.message,true));
+            }
+          }
+        };
+
+        row.appendChild(btn);
+        row.appendChild(menuBtn);
+        box.appendChild(row);
+      });
+    }
+
+    async function selectConversation(id) {
+      activeConversationId = id;
+      activeBranchId = null;
+      renderConversations();
+      renderMoveOptions();
+      const conv = conversations.find(c => c.id === id);
+      $('conversationTitleLabel').textContent = conv ? conv.title : 'Active conversation';
+
+      try {
+        await loadBranches(id);
+        const history = await api(`/api/chat/${encodeURIComponent(id)}`);
+        $('chat').replaceChildren();
+        if (history.length > 0) {
+          $('welcome').classList.add('hidden');
+          $('suggestions').classList.add('hidden');
+          history.forEach(m => appendMessage(m.role, m.content));
+        } else {
+          setStarted();
+        }
+      } catch (err) {
+        toast(err.message, true);
+      }
+    }
+
+    function renderMoveOptions() {
+      const select = $('moveConversation');
+      if (!activeConversationId) {
+        select.classList.add('hidden');
+        return;
+      }
+      select.classList.remove('hidden');
+      select.replaceChildren();
+
+      const general = document.createElement('option');
+      general.value = '';
+      general.textContent = 'Move to: None (General)';
+      select.appendChild(general);
+
+      projects.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = `Move to: ${p.name}`;
+        select.appendChild(opt);
+      });
+
+      const conv = conversations.find(c => c.id === activeConversationId);
+      select.value = conv?.projectId || '';
+    }
+
+    function newChat() {
+      activeConversationId = null;
+      activeBranchId = null;
+      loadBranches(null);
+      renderConversations();
+      renderMoveOptions();
+      $('conversationTitleLabel').textContent = 'New conversation';
+      $('chat').replaceChildren();
+      setStarted();
+      $('chatInput').focus();
+    }
+
+    function setStarted() {
+      $('welcome').classList.remove('hidden');
+      $('suggestions').classList.remove('hidden');
+    }
+
+    // TELEMETRY TRACKER
+    let latestTelemetry = { latencyMs: 0, promptTokens: 0, completionTokens: 0, totalTokens: 0, estimatedCost: 0 };
+    function updateTelemetry(data) {
+      if (!data) return;
+      latestTelemetry = {
+        latencyMs: data.latencyMs || 0,
+        promptTokens: data.promptTokens || 0,
+        completionTokens: data.completionTokens || 0,
+        totalTokens: data.totalTokens || 0,
+        estimatedCost: data.estimatedCost || 0
+      };
+      $('telLatency').textContent = latestTelemetry.latencyMs;
+      $('telTokens').textContent = latestTelemetry.totalTokens;
+      $('telCost').textContent = '$' + Number(latestTelemetry.estimatedCost).toFixed(4);
+
+      $('telModalLatency').textContent = latestTelemetry.latencyMs + ' ms';
+      $('telModalPromptTokens').textContent = latestTelemetry.promptTokens;
+      $('telModalCompletionTokens').textContent = latestTelemetry.completionTokens;
+      $('telModalTotalTokens').textContent = latestTelemetry.totalTokens;
+      $('telModalCost').textContent = '$' + Number(latestTelemetry.estimatedCost).toFixed(6);
+    }
+    $('telemetryBadge').onclick = () => $('telemetryModal').showModal();
+
+    function appendMessage(role, text) {
+      $('welcome').classList.add('hidden');
+      $('suggestions').classList.add('hidden');
+
+      const row = document.createElement('div');
+      row.className = `message-row ${role === 'user' ? 'user' : 'bot'}`;
+
+      const avatar = document.createElement('div');
+      avatar.className = 'message-avatar';
+      avatar.textContent = role === 'user' ? ((currentUser?.name||'U').charAt(0).toUpperCase()) : '⌘';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.innerHTML = renderMarkdown(text);
+
+      if (role === 'user') {
+        row.appendChild(bubble);
+        row.appendChild(avatar);
+      } else {
+        row.appendChild(avatar);
+        row.appendChild(bubble);
+      }
+
+      $('chat').appendChild(row);
+      $('chat').scrollTop = $('chat').scrollHeight;
+    }
+
+    // CODE ACTIONS & SNIPPET HELPERS
+    function copyCodeSnippet(id, btn) {
+      const codeEl = document.getElementById(id);
+      if (!codeEl) return;
+      const text = codeEl.innerText || codeEl.textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy', 2000);
+      });
+    }
+
+    function runTerminalSnippet(id, btn) {
+      copyCodeSnippet(id, btn);
+      toast('Command copied to clipboard. Ready to paste in terminal.');
+    }
+
+    async function analyzeAstSnippet(id) {
+      const codeEl = document.getElementById(id);
+      if (!codeEl) return;
+      const code = codeEl.innerText || codeEl.textContent;
+      try {
+        const res = await api('/api/analysis/ast', {
+          method: 'POST',
+          body: JSON.stringify({ code, language: 'java' })
+        });
+        renderAstTree(res.root);
+        $('astModal').showModal();
+      } catch (err) {
+        toast('AST Analysis failed: ' + err.message, true);
+      }
+    }
+
+    async function inspectDiffSnippet(id) {
+      const codeEl = document.getElementById(id);
+      if (!codeEl) return;
+      const code = codeEl.innerText || codeEl.textContent;
+      const original = prompt('Paste original code snippet to compute unified diff:');
+      if (original === null) return;
+      try {
+        const res = await api('/api/analysis/diff', {
+          method: 'POST',
+          body: JSON.stringify({ originalCode: original, refactoredCode: code })
+        });
+        renderDiffModal(res);
+        $('diffModal').showModal();
+      } catch (err) {
+        toast('Diff generation failed: ' + err.message, true);
+      }
+    }
+
+    function renderMarkdown(raw) {
+      if (!raw) return '';
+      const safe = escapeHtml(raw);
+      // Code blocks with syntax copy and action header
+      const withBlocks = safe.replace(/```([a-z0-9_-]*)\n([\s\S]*?)```/gi, (match, lang, code) => {
+        const language = (lang || 'CODE').toLowerCase();
+        const codeId = 'code_' + Math.random().toString(36).substring(2, 9);
+        const isTerminal = ['bash', 'sh', 'shell', 'zsh', 'powershell', 'cmd', 'terminal'].includes(language);
+        const isJava = language === 'java';
+
+        let actionBtns = `<button class="code-copy-btn" type="button" onclick="copyCodeSnippet('${codeId}', this)">Copy</button>`;
+        if (isTerminal) {
+          actionBtns += `<button class="terminal-action-btn" type="button" onclick="runTerminalSnippet('${codeId}', this)">▶ Run</button>`;
+        }
+        if (isJava) {
+          actionBtns += `<button class="terminal-action-btn" type="button" onclick="analyzeAstSnippet('${codeId}')">🔍 AST</button>`;
+        }
+        actionBtns += `<button class="terminal-action-btn" type="button" onclick="inspectDiffSnippet('${codeId}')">⚖️ Diff</button>`;
+
+        return `<div class="code-block-wrapper">
+          <div class="code-block-header">
+            <span>${language.toUpperCase()}</span>
+            <div class="code-action-group">${actionBtns}</div>
+          </div>
+          <pre><code id="${codeId}" class="language-${language}">${code.trim()}</code></pre>
+        </div>`;
+      });
+      // Inline code
+      const withInline = withBlocks.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+      // Bold
+      const withBold = withInline.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      // Linebreaks
+      return withBold.replace(/\n/g, '<br>');
+    }
+
+    function escapeHtml(str) {
+      return (str || '').replace(/[&<>"']/g, m => ({
+        '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+      })[m]);
+    }
+
+    // AUTO-RESIZING TEXTAREA
+    const textarea = $('chatInput');
+    textarea.addEventListener('input', () => {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 160) + 'px';
+    });
+
+    textarea.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        $('chatForm').requestSubmit();
+      }
+    });
+
+    // CHAT SUBMIT HANDLER
+    $('chatForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const message = textarea.value.trim();
+      if (!message || isSending) return;
+
+      isSending = true;
+      $('sendButton').disabled = true;
+      textarea.value = '';
+      textarea.style.height = '44px';
+
+      appendMessage('user', message);
+
+      try {
+        const payload = {
+          message,
+          sessionId: activeConversationId,
+          projectId: activeProjectId
+        };
+        const res = await api('/api/chat', {method:'POST', body:JSON.stringify(payload)});
+        activeConversationId = res.sessionId;
+        updateTelemetry(res);
+        appendMessage('bot', res.reply.content);
+        await loadConversations($('conversationSearch').value.trim());
+        await loadBranches(activeConversationId);
+        renderMoveOptions();
+      } catch (err) {
+        appendMessage('bot', `⚠️ Could not complete request: ${err.message}`);
+        toast(err.message, true);
+      } finally {
+        isSending = false;
+        $('sendButton').disabled = false;
+        textarea.focus();
+      }
+    };
+
+    // ==========================================================
+    // PRO ADVANCED WORKSPACE FEATURES
+    // ==========================================================
+
+    // 1. AST TREE VISUALIZER
+    function renderAstTree(node, depth = 0) {
+      const container = $('astTreeContainer');
+      if (depth === 0) container.replaceChildren();
+      if (!node) return;
+
+      const row = document.createElement('div');
+      row.className = 'ast-node';
+      row.style.paddingLeft = (depth * 20 + 8) + 'px';
+
+      const type = (node.type || 'NODE').toLowerCase();
+      let badgeClass = 'control';
+      if (type.includes('class') || type.includes('interface')) badgeClass = 'class';
+      else if (type.includes('method') || type.includes('constructor')) badgeClass = 'method';
+
+      row.innerHTML = `
+        <span class="ast-line-num">L${node.startLine || 1}</span>
+        <span class="ast-badge ${badgeClass}">${escapeHtml(node.type)}</span>
+        <span style="color:var(--text);font-weight:600;">${escapeHtml(node.name || '')}</span>
+      `;
+      container.appendChild(row);
+
+      if (node.children && node.children.length > 0) {
+        node.children.forEach(child => renderAstTree(child, depth + 1));
+      }
+    }
+
+    // 2. UNIFIED DIFF VIEWER
+    let currentPatchText = '';
+    function renderDiffModal(diffRes) {
+      currentPatchText = diffRes.unifiedPatch || '';
+      $('diffAddedBadge').textContent = `+${diffRes.linesAdded} lines`;
+      $('diffDeletedBadge').textContent = `-${diffRes.linesDeleted} lines`;
+
+      const linesBox = $('diffLinesContainer');
+      linesBox.replaceChildren();
+
+      const lines = (diffRes.unifiedPatch || '').split('\n');
+      lines.forEach(l => {
+        const div = document.createElement('div');
+        div.className = 'diff-line';
+        if (l.startsWith('+') && !l.startsWith('+++')) div.classList.add('added');
+        else if (l.startsWith('-') && !l.startsWith('---')) div.classList.add('deleted');
+        else if (l.startsWith('@@') || l.startsWith('---') || l.startsWith('+++')) div.classList.add('header');
+        div.textContent = l;
+        linesBox.appendChild(div);
+      });
+    }
+
+    $('copyPatchBtn').onclick = () => {
+      navigator.clipboard.writeText(currentPatchText).then(() => toast('Patch copied to clipboard.'));
+    };
+
+    // 3. CONVERSATION BRANCHING CRUD
+    let activeBranchId = null;
+    let conversationBranches = [];
+
+    async function loadBranches(conversationId) {
+      if (!conversationId) {
+        $('branchControl').classList.add('hidden');
+        return;
+      }
+      $('branchControl').classList.remove('hidden');
+      try {
+        conversationBranches = await api(`/api/conversations/${encodeURIComponent(conversationId)}/branches`);
+        const select = $('branchSelect');
+        select.replaceChildren();
+
+        const mainOpt = document.createElement('option');
+        mainOpt.value = '';
+        mainOpt.textContent = 'main';
+        select.appendChild(mainOpt);
+
+        conversationBranches.forEach(b => {
+          const opt = document.createElement('option');
+          opt.value = b.id;
+          opt.textContent = b.name;
+          select.appendChild(opt);
+        });
+
+        select.value = activeBranchId || '';
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    $('branchSelect').onchange = (e) => {
+      activeBranchId = e.target.value || null;
+      toast(activeBranchId ? `Switched to branch: ${e.target.options[e.target.selectedIndex].text}` : 'Switched to main thread');
+    };
+
+    $('newBranchBtn').onclick = () => {
+      if (!activeConversationId) {
+        toast('Start or select a conversation before creating a branch.', true);
+        return;
+      }
+      $('branchNameInput').value = '';
+      $('branchModal').showModal();
+    };
+
+    $('createBranchForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const branchName = $('branchNameInput').value.trim();
+      if (!branchName || !activeConversationId) return;
+      try {
+        const newBranch = await api(`/api/conversations/${encodeURIComponent(activeConversationId)}/branches`, {
+          method: 'POST',
+          body: JSON.stringify({ name: branchName })
+        });
+        $('branchModal').close();
+        activeBranchId = newBranch.id;
+        await loadBranches(activeConversationId);
+        toast(`Branch "${newBranch.name}" created.`);
+      } catch (err) {
+        toast(err.message, true);
+      }
+    };
+
+    // 4. SPOTLIGHT COMMAND PALETTE (Ctrl+K)
+    let paletteItems = [];
+    let selectedPaletteIndex = 0;
+
+    function openCommandPalette() {
+      const palette = $('commandPaletteDialog');
+      $('paletteInput').value = '';
+      buildPaletteItems('');
+      palette.showModal();
+      $('paletteInput').focus();
+    }
+
+    function buildPaletteItems(query = '') {
+      const q = query.toLowerCase().trim();
+      const defaultCommands = [
+        { icon: '💬', title: 'New Conversation', desc: 'Start a fresh developer chat', shortcut: 'Ctrl+Shift+O', action: () => newChat() },
+        { icon: '🌿', title: 'Fork Branch', desc: 'Create a new conversation branch', shortcut: 'Branch', action: () => $('newBranchBtn').click() },
+        { icon: '📌', title: 'Context Drawer', desc: 'View and pin workspace snippets and schemas', shortcut: 'Context', action: () => openContextDrawer() },
+        { icon: '⏱️', title: 'Milestone Checkpoints', desc: 'Save and view conversation timeline snapshots', shortcut: 'Timeline', action: () => openCheckpoints() },
+        { icon: '⚖️', title: 'Multi-Model Compare', desc: 'Benchmark Gemini models side-by-side', shortcut: 'Compare', action: () => openMultiModel() },
+        { icon: '👥', title: 'Share & Collaborate', desc: 'Invite engineers to this workspace', shortcut: 'Share', action: () => openShare() },
+        { icon: '🔑', title: 'API Keys', desc: 'Generate and manage programmatic API keys', shortcut: 'Settings', action: () => { window.location.hash = '#settings/api-keys'; } },
+        { icon: '⚙️', title: 'Workspace Settings', desc: 'Manage profile, security, and theme preferences', shortcut: 'Settings', action: () => { window.location.hash = '#settings/profile'; } },
+        { icon: '🌓', title: 'Switch Theme', desc: 'Toggle dark / light appearance', shortcut: 'Theme', action: () => toggleTheme() }
+      ];
+
+      conversations.forEach(c => {
+        defaultCommands.push({
+          icon: '📄',
+          title: c.title || 'Untitled chat',
+          desc: 'Open conversation',
+          shortcut: 'Chat',
+          action: () => selectConversation(c.id)
+        });
+      });
+
+      paletteItems = defaultCommands.filter(item =>
+        !q || item.title.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q)
+      );
+
+      selectedPaletteIndex = 0;
+      renderPaletteResults();
+    }
+
+    function renderPaletteResults() {
+      const box = $('paletteResults');
+      box.replaceChildren();
+
+      if (paletteItems.length === 0) {
+        box.innerHTML = `<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:13px;">No matching commands or conversations found.</div>`;
+        return;
+      }
+
+      paletteItems.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = `palette-item ${idx === selectedPaletteIndex ? 'selected' : ''}`;
+        div.innerHTML = `
+          <div class="palette-item-left">
+            <span class="palette-item-icon">${item.icon}</span>
+            <div>
+              <div class="palette-item-title">${escapeHtml(item.title)}</div>
+              <div class="palette-item-desc">${escapeHtml(item.desc)}</div>
+            </div>
+          </div>
+          <span class="palette-item-shortcut">${item.shortcut}</span>
+        `;
+        div.onclick = () => {
+          $('commandPaletteDialog').close();
+          item.action();
+        };
+        box.appendChild(div);
+      });
+    }
+
+    $('paletteInput').oninput = (e) => {
+      buildPaletteItems(e.target.value);
+    };
+
+    $('paletteInput').onkeydown = (e) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        selectedPaletteIndex = (selectedPaletteIndex + 1) % paletteItems.length;
+        renderPaletteResults();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        selectedPaletteIndex = (selectedPaletteIndex - 1 + paletteItems.length) % paletteItems.length;
+        renderPaletteResults();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (paletteItems[selectedPaletteIndex]) {
+          $('commandPaletteDialog').close();
+          paletteItems[selectedPaletteIndex].action();
+        }
+      }
+    };
+
+    // 5. CONVERSATION CONTEXT & PINNING DRAWER
+    async function openContextDrawer() {
+      $('contextDrawer').showModal();
+      await loadContextItems();
+    }
+    $('openContextBtn').onclick = openContextDrawer;
+
+    async function loadContextItems() {
+      try {
+        const items = await api(`/api/context${activeConversationId ? '?conversationId=' + encodeURIComponent(activeConversationId) : ''}`);
+        const box = $('contextItemsList');
+        box.replaceChildren();
+
+        if (items.length === 0) {
+          box.innerHTML = `<div style="color:var(--text-dim);font-size:12px;padding:12px;text-align:center;">No pinned context items yet. Pin schemas or snippets above.</div>`;
+          return;
+        }
+
+        items.forEach(it => {
+          const div = document.createElement('div');
+          div.className = 'drawer-item';
+          div.innerHTML = `
+            <div style="min-width:0;flex:1;">
+              <div class="drawer-item-title">${escapeHtml(it.name)} <span class="badge badge-muted">${it.type}</span></div>
+              <div class="drawer-item-desc">${escapeHtml(it.content.substring(0, 100))}${it.content.length > 100 ? '…' : ''}</div>
+            </div>
+            <button class="secondary" style="padding:4px 8px;font-size:11px;" type="button">Remove</button>
+          `;
+          div.querySelector('button').onclick = async () => {
+            try {
+              await api(`/api/context/${it.id}`, {method:'DELETE'});
+              await loadContextItems();
+              toast('Context item removed.');
+            } catch (err) { toast(err.message, true); }
+          };
+          box.appendChild(div);
+        });
+      } catch (err) {
+        toast(err.message, true);
+      }
+    }
+
+    $('addContextForm').onsubmit = async (e) => {
+      e.preventDefault();
+      try {
+        await api('/api/context', {
+          method: 'POST',
+          body: JSON.stringify({
+            name: $('ctxName').value.trim(),
+            type: $('ctxType').value,
+            content: $('ctxContent').value.trim(),
+            conversationId: activeConversationId,
+            projectId: activeProjectId
+          })
+        });
+        $('addContextForm').reset();
+        await loadContextItems();
+        toast('Context pinned successfully.');
+      } catch (err) {
+        toast(err.message, true);
+      }
+    };
+
+    // 6. MULTI-MODEL SIDE-BY-SIDE BENCHMARK
+    function openMultiModel() {
+      $('multiModelModal').showModal();
+    }
+    $('openMultiModelBtn').onclick = openMultiModel;
+
+    $('multiModelForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const promptText = $('multiModelPrompt').value.trim();
+      if (!promptText) return;
+      $('multiModelSubmitBtn').disabled = true;
+      $('multiModelResults').innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--text-muted);">Benchmarking models concurrently...</div>`;
+
+      try {
+        const res = await api('/api/analysis/multi-model', {
+          method: 'POST',
+          body: JSON.stringify({
+            prompt: promptText,
+            models: ['gemini-2.5-flash', 'gemini-2.5-pro']
+          })
+        });
+        renderMultiModelResults(res);
+      } catch (err) {
+        $('multiModelResults').innerHTML = `<div class="notice error" style="grid-column:1/-1;">Benchmark failed: ${escapeHtml(err.message)}</div>`;
+      } finally {
+        $('multiModelSubmitBtn').disabled = false;
+      }
+    };
+
+    function renderMultiModelResults(data) {
+      const grid = $('multiModelResults');
+      grid.replaceChildren();
+
+      data.results.forEach(m => {
+        const card = document.createElement('div');
+        card.className = 'model-card';
+        card.innerHTML = `
+          <div class="model-header">
+            <span class="model-title">${escapeHtml(m.modelName)}</span>
+            <span class="model-metrics">⏱️ ${m.latencyMs}ms · ${m.totalTokens} tok · $${Number(m.estimatedCost).toFixed(5)}</span>
+          </div>
+          <div class="model-content">${renderMarkdown(m.content)}</div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // 7. CONVERSATION TIMELINE & CHECKPOINTS
+    async function openCheckpoints() {
+      if (!activeConversationId) {
+        toast('Please select an active conversation to view checkpoints.', true);
+        return;
+      }
+      $('checkpointsModal').showModal();
+      await loadCheckpoints();
+    }
+    $('openCheckpointsBtn').onclick = openCheckpoints;
+
+    async function loadCheckpoints() {
+      try {
+        const list = await api(`/api/conversations/${encodeURIComponent(activeConversationId)}/checkpoints`);
+        const box = $('checkpointsList');
+        box.replaceChildren();
+
+        if (list.length === 0) {
+          box.innerHTML = `<div style="color:var(--text-dim);font-size:12px;padding:12px;text-align:center;">No checkpoints saved yet for this conversation.</div>`;
+          return;
+        }
+
+        list.forEach(chk => {
+          const div = document.createElement('div');
+          div.className = 'drawer-item';
+          div.innerHTML = `
+            <div>
+              <div class="drawer-item-title">${escapeHtml(chk.title)}</div>
+              <div class="drawer-item-desc">${escapeHtml(chk.description || '')} · <span style="font-family:var(--font-mono);">${new Date(chk.createdAt).toLocaleString()}</span></div>
+            </div>
+            <span class="badge badge-success">Saved</span>
+          `;
+          box.appendChild(div);
+        });
+      } catch (err) {
+        toast(err.message, true);
+      }
+    }
+
+    $('createCheckpointForm').onsubmit = async (e) => {
+      e.preventDefault();
+      if (!activeConversationId) return;
+      try {
+        await api(`/api/conversations/${encodeURIComponent(activeConversationId)}/checkpoints`, {
+          method: 'POST',
+          body: JSON.stringify({
+            title: $('chkTitle').value.trim(),
+            description: $('chkDesc').value.trim(),
+            branchId: activeBranchId
+          })
+        });
+        $('createCheckpointForm').reset();
+        await loadCheckpoints();
+        toast('Checkpoint saved.');
+      } catch (err) {
+        toast(err.message, true);
+      }
+    };
+
+    // 8. COLLABORATION & SHARING
+    async function openShare() {
+      if (!activeConversationId) {
+        toast('Please select a conversation before sharing.', true);
+        return;
+      }
+      $('shareModal').showModal();
+      await loadCollaborators();
+    }
+    $('openShareBtn').onclick = openShare;
+
+    async function loadCollaborators() {
+      try {
+        const collabs = await api(`/api/conversations/${encodeURIComponent(activeConversationId)}/collaborators`);
+        const box = $('collaboratorsList');
+        box.replaceChildren();
+
+        if (collabs.length === 0) {
+          box.innerHTML = `<div style="color:var(--text-dim);font-size:12px;padding:12px;text-align:center;">No collaborators invited yet.</div>`;
+          return;
+        }
+
+        collabs.forEach(c => {
+          const div = document.createElement('div');
+          div.className = 'drawer-item';
+          div.innerHTML = `
+            <div class="drawer-item-title">${escapeHtml(c.collaboratorEmail)} <span class="badge badge-success">${c.role}</span></div>
+            <span style="font-size:11px;color:var(--text-dim);">${new Date(c.createdAt).toLocaleDateString()}</span>
+          `;
+          box.appendChild(div);
+        });
+      } catch (err) {
+        toast(err.message, true);
+      }
+    }
+
+    $('inviteCollaboratorForm').onsubmit = async (e) => {
+      e.preventDefault();
+      if (!activeConversationId) return;
+      try {
+        await api(`/api/conversations/${encodeURIComponent(activeConversationId)}/collaborators`, {
+          method: 'POST',
+          body: JSON.stringify({
+            collaboratorEmail: $('collabEmail').value.trim(),
+            role: $('collabRole').value
+          })
+        });
+        $('inviteCollaboratorForm').reset();
+        await loadCollaborators();
+        toast('Collaborator invited.');
+      } catch (err) {
+        toast(err.message, true);
+      }
+    };
+
+    // SUGGESTION TILES CLICK
+    document.querySelectorAll('.suggestion').forEach(btn => {
+      btn.onclick = () => {
+        textarea.value = btn.dataset.prompt;
+        $('chatForm').requestSubmit();
+      };
+    });
+
+    // SEARCH DEBOUNCE
+    $('conversationSearch').addEventListener('input', () => {
+      clearTimeout(window.searchTimer);
+      window.searchTimer = setTimeout(() => {
+        loadConversations($('conversationSearch').value.trim()).catch(e => toast(e.message, true));
+      }, 200);
+    });
+
+    // MOVE CONVERSATION
+    $('moveConversation').addEventListener('change', async () => {
+      if (!activeConversationId) return;
+      try {
+        const target = $('moveConversation').value || null;
+        await api(`/api/conversations/${encodeURIComponent(activeConversationId)}/project`, {
+          method: 'PATCH',
+          body: JSON.stringify({projectId: target})
+        });
+        activeProjectId = target;
+        await loadProjects();
+        await loadConversations($('conversationSearch').value.trim());
+        renderMoveOptions();
+        toast('Conversation moved.');
+      } catch (err) {
+        toast(err.message, true);
+      }
+    });
+
+    // PROJECT MANAGEMENT
+    $('createProject').onclick = () => showProjectDialog();
+
+    function showProjectDialog(project = null) {
+      $('projectForm').reset();
+      $('projectId').value = project?.id || '';
+      $('projectDialogTitle').textContent = project ? 'Project Settings' : 'New Project';
+      $('projectName').value = project?.name || '';
+      $('projectDescription').value = project?.description || '';
+      $('projectInstructions').value = project?.instructions || '';
+      $('deleteProjectButton').classList.toggle('hidden', !project);
+      $('projectDialog').showModal();
+    }
+
+    $('projectForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const id = $('projectId').value;
+      const body = {
+        name: $('projectName').value.trim(),
+        description: $('projectDescription').value.trim(),
+        instructions: $('projectInstructions').value
+      };
+      try {
+        if (id) await api(`/api/projects/${id}`, {method:'PATCH', body:JSON.stringify(body)});
+        else await api('/api/projects', {method:'POST', body:JSON.stringify(body)});
+        $('projectDialog').close();
+        await loadProjects();
+        if (activeProjectId) await loadConversations($('conversationSearch').value.trim());
+        toast(id ? 'Project updated.' : 'Project created.');
+      } catch (err) {
+        toast(err.message, true);
+      }
+    };
+
+    $('deleteProjectButton').onclick = async () => {
+      const id = $('projectId').value;
+      if (!id) return;
+      if (confirm('Delete this project? Associated conversations will be preserved.')) {
+        try {
+          await api(`/api/projects/${id}`, {method:'DELETE'});
+          $('projectDialog').close();
+          if (activeProjectId === id) {
+            activeProjectId = null;
+            activeConversationId = null;
+            newChat();
+          }
+          await loadProjects();
+          await loadConversations();
+          toast('Project deleted.');
+        } catch (err) {
+          toast(err.message, true);
+        }
+      }
+    };
+
+    // AUTH FORMS
+    $('loginForm').onsubmit = async (e) => {
+      e.preventDefault();
+      try {
+        currentUser = await api('/api/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: $('loginEmail').value.trim(),
+            password: $('loginPassword').value
+          })
+        });
+        await csrf();
+        $('authScreen').classList.add('hidden');
+        $('appShell').classList.remove('hidden');
+        renderAccount();
+        await loadProjects();
+        await loadConversations();
+        handleRoute();
+      } catch (err) {
+        $('authNotice').textContent = err.message;
+        $('authNotice').className = 'notice error';
+        $('authNotice').classList.remove('hidden');
+      }
+    };
+
+    $('registerForm').onsubmit = async (e) => {
+      e.preventDefault();
+      try {
+        const res = await api('/api/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            name: $('regName').value.trim(),
+            email: $('regEmail').value.trim(),
+            password: $('regPassword').value
+          })
+        });
+        showAuth('login', res.message || 'Registration accepted. Please verify your email.');
+      } catch (err) {
+        $('authNotice').textContent = err.message;
+        $('authNotice').className = 'notice error';
+        $('authNotice').classList.remove('hidden');
+      }
+    };
+
+    $('forgotForm').onsubmit = async (e) => {
+      e.preventDefault();
+      try {
+        const res = await api('/api/auth/forgot-password', {
+          method: 'POST',
+          body: JSON.stringify({email: $('forgotEmail').value.trim()})
+        });
+        showAuth('login', res.message || 'If an account exists, a reset link was sent.');
+      } catch (err) {
+        $('authNotice').textContent = err.message;
+        $('authNotice').className = 'notice error';
+        $('authNotice').classList.remove('hidden');
+      }
+    };
+
+    $('resendForm').onsubmit = async (e) => {
+      e.preventDefault();
+      try {
+        const res = await api('/api/auth/resend-verification', {
+          method: 'POST',
+          body: JSON.stringify({email: $('resendEmail').value.trim()})
+        });
+        showAuth('login', res.message || 'A fresh verification email was sent.');
+      } catch (err) {
+        $('authNotice').textContent = err.message;
+        $('authNotice').className = 'notice error';
+        $('authNotice').classList.remove('hidden');
+      }
+    };
+
+    $('resetForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('resetToken');
+      try {
+        const res = await api('/api/auth/reset-password', {
+          method: 'POST',
+          body: JSON.stringify({token, newPassword: $('resetPassword').value})
+        });
+        window.history.replaceState({}, document.title, window.location.pathname);
+        showAuth('login', res.message || 'Password updated. You can now sign in.');
+      } catch (err) {
+        $('authNotice').textContent = err.message;
+        $('authNotice').className = 'notice error';
+        $('authNotice').classList.remove('hidden');
+      }
+    };
+
+    $('logoutButton').onclick = async () => {
+      try {
+        await api('/api/auth/logout', {method:'POST'});
+      } catch (err) {
+        console.error(err);
+      } finally {
+        currentUser = null;
+        csrfToken = '';
+        showAuth('login', 'You have been signed out.');
+        await csrf();
+      }
+    };
+
+    document.querySelectorAll('[data-auth]').forEach(btn => {
+      btn.onclick = () => showAuth(btn.dataset.auth);
+    });
+
+    document.querySelectorAll('[data-close]').forEach(btn => {
+      btn.onclick = () => $(btn.dataset.close).close();
+    });
+
+    $('newChat').onclick = () => { closeMobileSidebar(); newChat(); };
+    $('clearChat').onclick = async () => {
+      if (!activeConversationId) { newChat(); return; }
+      try {
+        await api('/api/chat/' + encodeURIComponent(activeConversationId), {method:'DELETE'});
+        $('chat').replaceChildren();
+        setStarted();
+        toast('Conversation messages cleared.');
+      } catch (err) {
+        toast(err.message, true);
+      }
+    };
+
+    // INITIALIZATION
+    async function init() {
+      try {
+        await csrf();
+        const urlParams = new URLSearchParams(window.location.search);
+        const verifyToken = urlParams.get('verifyToken');
+        const resetToken = urlParams.get('resetToken');
+
+        if (verifyToken) {
+          try {
+            const res = await api('/api/auth/verify-email', {
+              method: 'POST',
+              body: JSON.stringify({token: verifyToken})
+            });
+            window.history.replaceState({}, document.title, window.location.pathname);
+            showAuth('login', res.message || 'Email verified successfully! You may now sign in.');
+            return;
+          } catch (err) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+            showAuth('login', err.message);
+            return;
+          }
+        }
+
+        if (resetToken) {
+          showAuth('reset', 'Enter your new password below.');
+          return;
+        }
+
+        currentUser = await api('/api/auth/me');
+        $('authScreen').classList.add('hidden');
+        $('appShell').classList.remove('hidden');
+        renderAccount();
+        await loadProjects();
+        await loadConversations();
+        handleRoute();
+      } catch (err) {
+        showAuth('login');
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
