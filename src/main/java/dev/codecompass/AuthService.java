@@ -8,6 +8,7 @@ import java.time.ZoneOffset;
 import java.util.Base64;
 import java.util.HexFormat;
 import java.util.Locale;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,8 +39,13 @@ public class AuthService {
             throw new ApiException(HttpStatus.CONFLICT, "An account with this email already exists.");
         }
         validateNewPassword(request.password());
-        AppUser user = users.saveAndFlush(new AppUser(request.name().trim(), email,
-                passwordEncoder.encode(request.password())));
+        AppUser user;
+        try {
+            user = users.saveAndFlush(new AppUser(request.name().trim(), email,
+                    passwordEncoder.encode(request.password())));
+        } catch (DataIntegrityViolationException exception) {
+            throw new ApiException(HttpStatus.CONFLICT, "An account with this email already exists.");
+        }
         issueToken(user, AuthToken.Purpose.VERIFY_EMAIL, 24 * 60);
     }
 

@@ -4318,8 +4318,15 @@
       }
     };
 
+    let registrationInFlight = false;
     $('registerForm').onsubmit = async (e) => {
       e.preventDefault();
+      if (registrationInFlight) return;
+      registrationInFlight = true;
+      const submitButton = $('registerForm').querySelector('button[type="submit"]');
+      const originalButtonText = submitButton.textContent;
+      submitButton.disabled = true;
+      submitButton.textContent = 'Creating account…';
       try {
         const res = await api('/api/auth/register', {
           method: 'POST',
@@ -4334,6 +4341,10 @@
         $('authNotice').textContent = err.message;
         $('authNotice').className = 'notice error';
         $('authNotice').classList.remove('hidden');
+      } finally {
+        registrationInFlight = false;
+        submitButton.disabled = false;
+        submitButton.textContent = originalButtonText;
       }
     };
 
