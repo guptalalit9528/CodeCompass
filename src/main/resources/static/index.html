@@ -2982,7 +2982,12 @@
         console.log('EmailJS OTP delivery success:', res.status, res.text);
         return res;
       } catch (err) {
-        console.warn('EmailJS delivery warning:', err);
+        console.error('EmailJS send error:', err);
+        const errMsg = err?.text || err?.message || 'Email delivery failed.';
+        $('authNotice').textContent = 'EmailJS: ' + errMsg;
+        $('authNotice').className = 'notice error';
+        $('authNotice').classList.remove('hidden');
+        throw err;
       }
     }
 
@@ -4453,11 +4458,10 @@
         $('otpEmailDisplay').textContent = email;
         $('otpEmailValue').value = email;
         document.querySelectorAll('.otp-digit').forEach(d => d.value = '');
-        showAuth('otp', 'A 6-digit code was sent to ' + email + ' (Code: ' + res.otp + ')');
-        console.log('%c[CodeCompass Verification Code]', 'color: #bef264; font-weight: bold; font-size: 16px;', res.otp);
+        showAuth('otp', 'A 6-digit verification code has been sent to ' + email + '. Check your inbox.');
         startOtpCountdown(30);
         if (res.otp) {
-          sendOtpEmail(email, name, res.otp);
+          await sendOtpEmail(email, name, res.otp);
         }
       } catch (err) {
         $('authNotice').textContent = err.message;
@@ -4584,13 +4588,12 @@
         document.querySelectorAll('.otp-digit').forEach(d => d.value = '');
         const firstDigit = document.querySelector('.otp-digit');
         if (firstDigit) firstDigit.focus();
-        $('authNotice').textContent = 'A new 6-digit code was sent to ' + email + ' (Code: ' + res.otp + ')';
+        $('authNotice').textContent = 'A new 6-digit verification code has been sent to ' + email + '. Check your inbox.';
         $('authNotice').className = 'notice';
         $('authNotice').classList.remove('hidden', 'error');
-        console.log('%c[CodeCompass Verification Code]', 'color: #bef264; font-weight: bold; font-size: 16px;', res.otp);
 
         if (res.otp) {
-          sendOtpEmail(email, '', res.otp);
+          await sendOtpEmail(email, '', res.otp);
         }
       } catch (err) {
         $('authNotice').textContent = err.message;
@@ -4626,11 +4629,10 @@
         $('otpEmailDisplay').textContent = email;
         $('otpEmailValue').value = email;
         document.querySelectorAll('.otp-digit').forEach(d => d.value = '');
-        showAuth('otp', 'A 6-digit code was sent to ' + email + ' (Code: ' + res.otp + ')');
-        console.log('%c[CodeCompass Verification Code]', 'color: #bef264; font-weight: bold; font-size: 16px;', res.otp);
+        showAuth('otp', 'A 6-digit verification code has been sent to ' + email + '. Check your inbox.');
         startOtpCountdown(30);
         if (res.otp) {
-          sendOtpEmail(email, '', res.otp);
+          await sendOtpEmail(email, '', res.otp);
         }
       } catch (err) {
         $('authNotice').textContent = err.message;
