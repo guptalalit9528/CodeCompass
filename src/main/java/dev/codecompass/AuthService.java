@@ -38,9 +38,6 @@ public class AuthService {
         AppUser user;
         if (users.existsByEmailIgnoreCase(email)) {
             AppUser existing = users.findByEmailIgnoreCase(email).orElse(null);
-            if (existing != null && existing.isEnabled()) {
-                throw new ApiException(HttpStatus.CONFLICT, "An account with this email already exists.");
-            }
             if (existing != null) {
                 existing.setName(request.name().trim());
                 existing.setPasswordHash(passwordEncoder.encode(request.password()));
@@ -58,7 +55,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void verifyOtp(String emailInput, String otpInput) {
+    public AppUser verifyOtp(String emailInput, String otpInput) {
         String email = normalizeEmail(emailInput);
         if (!StringUtils.hasText(otpInput) || otpInput.trim().length() != 6) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Please enter a valid 6-digit verification code.");
@@ -66,9 +63,6 @@ public class AuthService {
         String otp = otpInput.trim();
         AppUser user = users.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "No account found for this email address."));
-        if (user.isEnabled()) {
-            return;
-        }
         String hash = sha256(email + ":" + otp);
         AuthToken token = tokens.findByTokenHash(hash)
                 .filter(t -> t.getPurpose() == AuthToken.Purpose.VERIFY_EMAIL)
@@ -76,8 +70,9 @@ public class AuthService {
                 .filter(t -> t.getExpiresAt().isAfter(LocalDateTime.now(ZoneOffset.UTC)))
                 .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "Invalid or expired verification code. Please request a new one."));
         user.setEnabled(true);
-        users.saveAndFlush(user);
+        user = users.saveAndFlush(user);
         token.consume();
+        return user;
     }
 
     @Transactional

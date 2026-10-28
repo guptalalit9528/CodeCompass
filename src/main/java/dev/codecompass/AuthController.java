@@ -53,9 +53,19 @@ public class AuthController {
     }
 
     @PostMapping("/verify-otp")
-    public AuthDtos.MessageResponse verifyOtp(@Valid @RequestBody AuthDtos.VerifyOtpRequest request) {
-        authService.verifyOtp(request.email(), request.otp());
-        return new AuthDtos.MessageResponse("Your email has been verified! You can now sign in.");
+    public AuthDtos.UserResponse verifyOtp(@Valid @RequestBody AuthDtos.VerifyOtpRequest request,
+                                           HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+        AppUser user = authService.verifyOtp(request.email(), request.otp());
+        UserPrincipal principal = new UserPrincipal(user);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        servletRequest.getSession(true);
+        sessionStrategy.onAuthentication(authentication, servletRequest, servletResponse);
+        contextRepository.saveContext(context, servletRequest, servletResponse);
+        rateLimiter.succeeded(servletRequest.getRemoteAddr());
+        return AuthDtos.UserResponse.from(user);
     }
 
     @PostMapping("/resend-otp")

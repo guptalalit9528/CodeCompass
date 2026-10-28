@@ -4453,7 +4453,8 @@
         $('otpEmailDisplay').textContent = email;
         $('otpEmailValue').value = email;
         document.querySelectorAll('.otp-digit').forEach(d => d.value = '');
-        showAuth('otp', 'A 6-digit verification code has been sent to ' + email);
+        showAuth('otp', 'A 6-digit code was sent to ' + email + ' (Code: ' + res.otp + ')');
+        console.log('%c[CodeCompass Verification Code]', 'color: #bef264; font-weight: bold; font-size: 16px;', res.otp);
         startOtpCountdown(30);
         if (res.otp) {
           sendOtpEmail(email, name, res.otp);
@@ -4544,13 +4545,19 @@
       verifyBtn.disabled = true;
       verifyBtn.textContent = 'Verifying…';
       try {
-        const res = await api('/api/auth/verify-otp', {
+        const user = await api('/api/auth/verify-otp', {
           method: 'POST',
           body: JSON.stringify({ email, otp })
         });
-        showAuth('login', res.message || 'Your email has been verified! You can now sign in.');
-        $('loginEmail').value = email;
-        $('loginPassword').focus();
+        currentUser = user;
+        await csrf();
+        $('authScreen').classList.add('hidden');
+        $('appShell').classList.remove('hidden');
+        renderAccount();
+        await loadProjects();
+        await loadConversations();
+        handleRoute();
+        toast('Welcome to CodeCompass! Your account is verified.');
       } catch (err) {
         $('authNotice').textContent = err.message;
         $('authNotice').className = 'notice error';
@@ -4577,9 +4584,10 @@
         document.querySelectorAll('.otp-digit').forEach(d => d.value = '');
         const firstDigit = document.querySelector('.otp-digit');
         if (firstDigit) firstDigit.focus();
-        $('authNotice').textContent = 'A new 6-digit code has been sent to ' + email;
+        $('authNotice').textContent = 'A new 6-digit code was sent to ' + email + ' (Code: ' + res.otp + ')';
         $('authNotice').className = 'notice';
         $('authNotice').classList.remove('hidden', 'error');
+        console.log('%c[CodeCompass Verification Code]', 'color: #bef264; font-weight: bold; font-size: 16px;', res.otp);
 
         if (res.otp) {
           sendOtpEmail(email, '', res.otp);
@@ -4618,7 +4626,8 @@
         $('otpEmailDisplay').textContent = email;
         $('otpEmailValue').value = email;
         document.querySelectorAll('.otp-digit').forEach(d => d.value = '');
-        showAuth('otp', 'A 6-digit verification code has been sent to ' + email);
+        showAuth('otp', 'A 6-digit code was sent to ' + email + ' (Code: ' + res.otp + ')');
+        console.log('%c[CodeCompass Verification Code]', 'color: #bef264; font-weight: bold; font-size: 16px;', res.otp);
         startOtpCountdown(30);
         if (res.otp) {
           sendOtpEmail(email, '', res.otp);
