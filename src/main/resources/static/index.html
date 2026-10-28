@@ -4636,13 +4636,6 @@
         $('authNotice').textContent = err.message;
         $('authNotice').className = 'notice error';
         $('authNotice').classList.remove('hidden');
-          body: JSON.stringify({email: $('resendEmail').value.trim()})
-        });
-        showAuth('login', res.message || 'A fresh verification email was sent.');
-      } catch (err) {
-        $('authNotice').textContent = err.message;
-        $('authNotice').className = 'notice error';
-        $('authNotice').classList.remove('hidden');
       }
     };
 
