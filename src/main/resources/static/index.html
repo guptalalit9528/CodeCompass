@@ -229,6 +229,30 @@
       border-color: var(--accent);
       box-shadow: 0 0 0 3px var(--accent-glow);
     }
+    .otp-inputs {
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+      margin: 8px 0;
+    }
+    .otp-digit {
+      width: 44px;
+      height: 52px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      font-family: var(--font-mono, monospace);
+      border: 1.5px solid var(--surface-border);
+      background: var(--surface-card);
+      border-radius: var(--radius-md);
+      color: var(--text);
+      outline: 0;
+      transition: var(--transition-smooth);
+    }
+    .otp-digit:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
 
     button.primary {
       background: var(--accent);
@@ -1868,6 +1892,32 @@
         </div>
       </form>
 
+      <!-- OTP VERIFICATION -->
+      <form id="otpForm" class="hidden">
+        <h1>Verify email</h1>
+        <p>Enter the 6-digit code sent to <strong id="otpEmailDisplay" style="color:var(--text);word-break:break-all;">your email</strong>.</p>
+        <div class="field">
+          <label>Verification Code</label>
+          <div class="otp-inputs" id="otpBoxContainer">
+            <input class="otp-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="one-time-code" required>
+            <input class="otp-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" required>
+            <input class="otp-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" required>
+            <input class="otp-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" required>
+            <input class="otp-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" required>
+            <input class="otp-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" required>
+          </div>
+          <input type="hidden" id="otpEmailValue">
+        </div>
+        <button class="primary" id="btnVerifyOtp" type="submit" style="width:100%;margin-top:6px;">Verify Account</button>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;font-size:12px;">
+          <button type="button" id="btnResendOtp" style="background:none;border:none;color:var(--accent);cursor:pointer;font-weight:600;padding:0;">Resend code</button>
+          <span id="otpCountdown" style="color:var(--text-muted);font-variant-numeric:tabular-nums;"></span>
+        </div>
+        <div class="auth-links" style="margin-top:12px;">
+          <button type="button" data-auth="login">Back to sign in</button>
+        </div>
+      </form>
+
       <!-- FORGOT PASSWORD -->
       <form id="forgotForm" class="hidden">
         <h1>Reset password</h1>
@@ -2890,8 +2940,52 @@
   <!-- TOAST NOTIFICATION -->
   <div id="toast" class="notice hidden" style="position:fixed;right:20px;bottom:20px;max-width:380px;z-index:99;box-shadow:0 12px 32px rgba(0,0,0,0.7);" role="status"></div>
 
+  <!-- EMAILJS SDK -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
   <!-- SCRIPT LOGIC -->
   <script>
+    const EMAILJS_CONFIG = {
+      serviceId: 'service_u13oqbu',
+      templateId: 'service_u13oqbu',
+      publicKey: 'seyaXRMuZ-rkL-96h'
+    };
+
+    if (window.emailjs) {
+      try {
+        emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
+      } catch (err) {
+        console.warn('EmailJS initialization warning:', err);
+      }
+    }
+
+    async function sendOtpEmail(email, name, otp) {
+      if (!window.emailjs) {
+        console.warn('EmailJS SDK not available.');
+        return;
+      }
+      try {
+        const templateParams = {
+          to_email: email,
+          email: email,
+          recipient: email,
+          to_name: name || 'Developer',
+          name: name || 'Developer',
+          otp: otp,
+          otp_code: otp,
+          code: otp,
+          passcode: otp,
+          token: otp,
+          message: 'Your CodeCompass verification code is: ' + otp + '. It expires in 15 minutes.'
+        };
+        const res = await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, templateParams, EMAILJS_CONFIG.publicKey);
+        console.log('EmailJS OTP delivery success:', res.status, res.text);
+        return res;
+      } catch (err) {
+        console.warn('EmailJS delivery warning:', err);
+      }
+    }
+
     const $ = id => document.getElementById(id);
     let csrfToken = '', currentUser = null, userPreferences = null;
     let projects = [], conversations = [], activeProjectId = null, activeConversationId = null;
@@ -2939,6 +3033,11 @@
     $('dropdownThemeToggle').onclick = () => { toggleDropdown(false); toggleTheme(); };
 
     // CSRF & API WRAPPER
+    function getXsrfCookie() {
+      const match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]+)/);
+      return match ? decodeURIComponent(match[1]) : '';
+    }
+
     async function csrf() {
       const response = await fetch('/api/auth/csrf', {credentials:'same-origin'});
       if (!response.ok) throw new Error('Could not initialize security context. Refresh and retry.');
@@ -2950,10 +3049,19 @@
       const headers = new Headers(options.headers || {});
       if (options.body && !headers.has('Content-Type')) headers.set('Content-Type','application/json');
       if (!['GET','HEAD','OPTIONS','TRACE'].includes(method)) {
-        if (!csrfToken) await csrf();
+        const cookieToken = getXsrfCookie();
+        if (cookieToken) {
+          csrfToken = cookieToken;
+        } else if (!csrfToken) {
+          await csrf();
+        }
         headers.set('X-XSRF-TOKEN', csrfToken);
       }
       const response = await fetch(url, {...options, method, headers, credentials:'same-origin'});
+      if (response.status === 403 && !options._retried && !['GET','HEAD','OPTIONS','TRACE'].includes(method)) {
+        await csrf();
+        return api(url, {...options, _retried: true});
+      }
       const data = response.status === 204 ? null : await response.json().catch(()=>null);
       if (!response.ok) {
         if (response.status === 401 && !url.startsWith('/api/auth/')) {
@@ -2983,9 +3091,13 @@
       $('authNotice').classList.remove('error');
       $('authNotice').textContent = message;
 
-      ['loginForm','registerForm','forgotForm','resendForm','resetForm'].forEach(id => {
+      ['loginForm','registerForm','forgotForm','resendForm','resetForm','otpForm'].forEach(id => {
         $(id).classList.toggle('hidden', id !== mode + 'Form');
       });
+      if (mode === 'otp') {
+        const firstDigit = document.querySelector('.otp-digit');
+        if (firstDigit) setTimeout(() => firstDigit.focus(), 80);
+      }
     }
 
     // ROUTING & VIEW NAVIGATION
@@ -4328,15 +4440,24 @@
       submitButton.disabled = true;
       submitButton.textContent = 'Creating account…';
       try {
+        const email = $('regEmail').value.trim();
+        const name = $('regName').value.trim();
         const res = await api('/api/auth/register', {
           method: 'POST',
           body: JSON.stringify({
-            name: $('regName').value.trim(),
-            email: $('regEmail').value.trim(),
+            name: name,
+            email: email,
             password: $('regPassword').value
           })
         });
-        showAuth('login', res.message || 'Registration accepted. Please verify your email.');
+        $('otpEmailDisplay').textContent = email;
+        $('otpEmailValue').value = email;
+        document.querySelectorAll('.otp-digit').forEach(d => d.value = '');
+        showAuth('otp', 'A 6-digit verification code has been sent to ' + email);
+        startOtpCountdown(30);
+        if (res.otp) {
+          sendOtpEmail(email, name, res.otp);
+        }
       } catch (err) {
         $('authNotice').textContent = err.message;
         $('authNotice').className = 'notice error';
@@ -4345,6 +4466,129 @@
         registrationInFlight = false;
         submitButton.disabled = false;
         submitButton.textContent = originalButtonText;
+      }
+    };
+
+    // OTP DIGIT BOX BEHAVIOR & SUBMISSION
+    let otpCountdownTimer = null;
+    function startOtpCountdown(seconds = 30) {
+      if (otpCountdownTimer) clearInterval(otpCountdownTimer);
+      const resendBtn = $('btnResendOtp');
+      const countdownSpan = $('otpCountdown');
+      if (resendBtn) resendBtn.disabled = true;
+      let remaining = seconds;
+      if (countdownSpan) countdownSpan.textContent = `(${remaining}s)`;
+      otpCountdownTimer = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+          clearInterval(otpCountdownTimer);
+          if (resendBtn) resendBtn.disabled = false;
+          if (countdownSpan) countdownSpan.textContent = '';
+        } else {
+          if (countdownSpan) countdownSpan.textContent = `(${remaining}s)`;
+        }
+      }, 1000);
+    }
+
+    const otpDigits = document.querySelectorAll('.otp-digit');
+    otpDigits.forEach((digitInput, idx) => {
+      digitInput.addEventListener('input', (e) => {
+        const val = e.target.value.replace(/[^0-9]/g, '');
+        e.target.value = val ? val.slice(-1) : '';
+        if (e.target.value && idx < otpDigits.length - 1) {
+          otpDigits[idx + 1].focus();
+        }
+      });
+
+      digitInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace') {
+          if (!digitInput.value && idx > 0) {
+            otpDigits[idx - 1].focus();
+            otpDigits[idx - 1].value = '';
+          }
+        } else if (e.key === 'ArrowLeft' && idx > 0) {
+          otpDigits[idx - 1].focus();
+        } else if (e.key === 'ArrowRight' && idx < otpDigits.length - 1) {
+          otpDigits[idx + 1].focus();
+        }
+      });
+
+      digitInput.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '');
+        if (!pasted) return;
+        const chars = pasted.slice(0, 6).split('');
+        chars.forEach((c, i) => {
+          if (otpDigits[i]) otpDigits[i].value = c;
+        });
+        const nextFocus = Math.min(chars.length, otpDigits.length - 1);
+        if (otpDigits[nextFocus]) otpDigits[nextFocus].focus();
+        if (chars.length === 6) {
+          $('otpForm').requestSubmit();
+        }
+      });
+    });
+
+    $('otpForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const email = $('otpEmailValue').value.trim();
+      const otp = Array.from(document.querySelectorAll('.otp-digit')).map(d => d.value.trim()).join('');
+      if (otp.length !== 6) {
+        $('authNotice').textContent = 'Please enter all 6 digits of your verification code.';
+        $('authNotice').className = 'notice error';
+        $('authNotice').classList.remove('hidden');
+        return;
+      }
+      const verifyBtn = $('btnVerifyOtp');
+      const origText = verifyBtn.textContent;
+      verifyBtn.disabled = true;
+      verifyBtn.textContent = 'Verifying…';
+      try {
+        const res = await api('/api/auth/verify-otp', {
+          method: 'POST',
+          body: JSON.stringify({ email, otp })
+        });
+        showAuth('login', res.message || 'Your email has been verified! You can now sign in.');
+        $('loginEmail').value = email;
+        $('loginPassword').focus();
+      } catch (err) {
+        $('authNotice').textContent = err.message;
+        $('authNotice').className = 'notice error';
+        $('authNotice').classList.remove('hidden');
+      } finally {
+        verifyBtn.disabled = false;
+        verifyBtn.textContent = origText;
+      }
+    };
+
+    $('btnResendOtp').onclick = async () => {
+      const email = $('otpEmailValue').value.trim();
+      if (!email) {
+        showAuth('register', 'Please enter your account details again.');
+        return;
+      }
+      try {
+        $('btnResendOtp').disabled = true;
+        const res = await api('/api/auth/resend-otp', {
+          method: 'POST',
+          body: JSON.stringify({ email })
+        });
+        startOtpCountdown(30);
+        document.querySelectorAll('.otp-digit').forEach(d => d.value = '');
+        const firstDigit = document.querySelector('.otp-digit');
+        if (firstDigit) firstDigit.focus();
+        $('authNotice').textContent = 'A new 6-digit code has been sent to ' + email;
+        $('authNotice').className = 'notice';
+        $('authNotice').classList.remove('hidden', 'error');
+
+        if (res.otp) {
+          sendOtpEmail(email, '', res.otp);
+        }
+      } catch (err) {
+        $('authNotice').textContent = err.message;
+        $('authNotice').className = 'notice error';
+        $('authNotice').classList.remove('hidden');
+        $('btnResendOtp').disabled = false;
       }
     };
 
@@ -4366,8 +4610,23 @@
     $('resendForm').onsubmit = async (e) => {
       e.preventDefault();
       try {
-        const res = await api('/api/auth/resend-verification', {
+        const email = $('resendEmail').value.trim();
+        const res = await api('/api/auth/resend-otp', {
           method: 'POST',
+          body: JSON.stringify({email})
+        });
+        $('otpEmailDisplay').textContent = email;
+        $('otpEmailValue').value = email;
+        document.querySelectorAll('.otp-digit').forEach(d => d.value = '');
+        showAuth('otp', 'A 6-digit verification code has been sent to ' + email);
+        startOtpCountdown(30);
+        if (res.otp) {
+          sendOtpEmail(email, '', res.otp);
+        }
+      } catch (err) {
+        $('authNotice').textContent = err.message;
+        $('authNotice').className = 'notice error';
+        $('authNotice').classList.remove('hidden');
           body: JSON.stringify({email: $('resendEmail').value.trim()})
         });
         showAuth('login', res.message || 'A fresh verification email was sent.');

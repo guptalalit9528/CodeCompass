@@ -45,10 +45,24 @@ public class AuthController {
     public AuthDtos.CsrfResponse csrf(CsrfToken token) { return new AuthDtos.CsrfResponse(token.getToken()); }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthDtos.MessageResponse> register(@Valid @RequestBody AuthDtos.RegisterRequest request) {
-        authService.register(request);
+    public ResponseEntity<AuthDtos.RegisterResponse> register(@Valid @RequestBody AuthDtos.RegisterRequest request) {
+        String otp = authService.register(request);
         return ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body(new AuthDtos.MessageResponse("Check your email for a verification link."));
+                .body(new AuthDtos.RegisterResponse("A 6-digit verification code has been sent to your email.",
+                        request.email().trim().toLowerCase(java.util.Locale.ROOT), request.name().trim(), otp));
+    }
+
+    @PostMapping("/verify-otp")
+    public AuthDtos.MessageResponse verifyOtp(@Valid @RequestBody AuthDtos.VerifyOtpRequest request) {
+        authService.verifyOtp(request.email(), request.otp());
+        return new AuthDtos.MessageResponse("Your email has been verified! You can now sign in.");
+    }
+
+    @PostMapping("/resend-otp")
+    public AuthDtos.ResendOtpResponse resendOtp(@Valid @RequestBody AuthDtos.ResendOtpRequest request) {
+        String email = request.email().trim().toLowerCase(java.util.Locale.ROOT);
+        String otp = authService.resendOtp(email);
+        return new AuthDtos.ResendOtpResponse("A new verification code has been sent to your email.", email, otp);
     }
 
     @PostMapping("/login")

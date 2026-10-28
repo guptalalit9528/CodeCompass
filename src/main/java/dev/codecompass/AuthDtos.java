@@ -23,6 +23,17 @@ public final class AuthDtos {
     public record TokenRequest(@NotBlank @Size(max = 256) String token) {
         @Override public String toString() { return "TokenRequest[token=[REDACTED]]"; }
     }
+    public record VerifyOtpRequest(@NotBlank @Email @Size(max = 254) String email,
+                                   @NotBlank @Size(min = 6, max = 6) String otp) {
+        @Override public String toString() { return "VerifyOtpRequest[email=" + email + ", otp=[REDACTED]]"; }
+    }
+    public record ResendOtpRequest(@NotBlank @Email @Size(max = 254) String email) {}
+    public record RegisterResponse(String message, String email, String name, String otp) {
+        @Override public String toString() { return "RegisterResponse[email=" + email + ", name=" + name + ", otp=[REDACTED]]"; }
+    }
+    public record ResendOtpResponse(String message, String email, String otp) {
+        @Override public String toString() { return "ResendOtpResponse[email=" + email + ", otp=[REDACTED]]"; }
+    }
     public record ForgotPasswordRequest(@NotBlank @Email @Size(max = 254) String email) {}
     public record ResendVerificationRequest(@NotBlank @Email @Size(max = 254) String email) {}
     public record ResetPasswordRequest(@NotBlank @Size(max = 256) String token,

@@ -51,6 +51,7 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.GET, "/", "/settings", "/index.html", "/favicon.ico", "/api/auth/csrf").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login", "/api/auth/verify-email",
+                        "/api/auth/verify-otp", "/api/auth/resend-otp",
                         "/api/auth/forgot-password", "/api/auth/reset-password", "/api/auth/resend-verification").permitAll()
                 .anyRequest().authenticated())
             .formLogin(AbstractHttpConfigurer::disable)
