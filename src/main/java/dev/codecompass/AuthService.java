@@ -35,23 +35,17 @@ public class AuthService {
     public String register(AuthDtos.RegisterRequest request) {
         String email = normalizeEmail(request.email());
         validateNewPassword(request.password());
-        AppUser user;
         if (users.existsByEmailIgnoreCase(email)) {
-            AppUser existing = users.findByEmailIgnoreCase(email).orElse(null);
-            if (existing != null) {
-                existing.setName(request.name().trim());
-                existing.setPasswordHash(passwordEncoder.encode(request.password()));
-                user = users.saveAndFlush(existing);
-                return issueOtp(user, AuthToken.Purpose.VERIFY_EMAIL, 15);
-            }
+            throw new ApiException(HttpStatus.CONFLICT, "An account with this email already exists.");
         }
+        AppUser user;
         try {
             user = users.saveAndFlush(new AppUser(request.name().trim(), email,
                     passwordEncoder.encode(request.password())));
         } catch (DataIntegrityViolationException exception) {
             throw new ApiException(HttpStatus.CONFLICT, "An account with this email already exists.");
         }
-        return issueOtp(user, AuthToken.Purpose.VERIFY_EMAIL, 15);
+        return issueTokens(user, 24 * 60);
     }
 
     @Transactional
@@ -83,7 +77,7 @@ public class AuthService {
         if (user.isEnabled()) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "This account is already verified. Please sign in.");
         }
-        return issueOtp(user, AuthToken.Purpose.VERIFY_EMAIL, 15);
+        return issueTokens(user, 24 * 60);
     }
 
     @Transactional
@@ -105,7 +99,7 @@ public class AuthService {
         mail.requireConfigured();
         users.findByEmailIgnoreCase(normalizeEmail(emailInput))
                 .filter(user -> !user.isEnabled())
-                .ifPresent(user -> issueToken(user, AuthToken.Purpose.VERIFY_EMAIL, 24 * 60));
+                .ifPresent(user -> issueTokens(user, 24 * 60));
     }
 
     @Transactional
@@ -139,16 +133,27 @@ public class AuthService {
         user.setPasswordHash(passwordEncoder.encode(newPassword));
     }
 
-    private String issueOtp(AppUser user, AuthToken.Purpose purpose, int minutes) {
-        tokens.deleteAllByUser_IdAndPurpose(user.getId(), purpose.name());
+    private String issueTokens(AppUser user, int minutes) {
+        tokens.deleteAllByUser_IdAndPurpose(user.getId(), AuthToken.Purpose.VERIFY_EMAIL.name());
+
+        // 1. URL Token (32 bytes entropy for link verification: /?verifyToken=...)
+        byte[] random = new byte[32];
+        secureRandom.nextBytes(random);
+        String raw = Base64.getUrlEncoder().withoutPadding().encodeToString(random);
+        String rawHash = sha256(raw);
+        tokens.save(new AuthToken(user, AuthToken.Purpose.VERIFY_EMAIL, rawHash,
+                LocalDateTime.now(ZoneOffset.UTC).plusMinutes(minutes)));
+
+        // 2. 6-digit OTP Token (for in-app 6-digit box verification: /api/auth/verify-otp)
         int code = 100000 + secureRandom.nextInt(900000);
         String otp = String.valueOf(code);
-        String hash = sha256(user.getEmail() + ":" + otp);
-        tokens.saveAndFlush(new AuthToken(user, purpose, hash,
-                LocalDateTime.now(ZoneOffset.UTC).plusMinutes(minutes)));
+        String otpHash = sha256(user.getEmail() + ":" + otp);
+        tokens.saveAndFlush(new AuthToken(user, AuthToken.Purpose.VERIFY_EMAIL, otpHash,
+                LocalDateTime.now(ZoneOffset.UTC).plusMinutes(Math.min(minutes, 60))));
+
         try {
-            if (mail != null && mail.isSmtpConfigured()) {
-                mail.sendVerification(user.getEmail(), otp);
+            if (mail != null && mail.isConfigured()) {
+                mail.sendVerification(user.getEmail(), raw, otp);
             }
         } catch (Exception ignored) {
             // EmailJS on frontend handles delivery directly

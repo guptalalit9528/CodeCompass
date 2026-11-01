@@ -6,3 +6,5 @@ data/
 !.env.example
 *.log
 start.ps1
+.DS_Store
+.idea/

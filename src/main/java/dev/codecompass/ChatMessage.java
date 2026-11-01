@@ -23,7 +23,7 @@ public class ChatMessage {
     @Column(nullable = false, length = 16)
     private String role;
 
-    @Column(nullable = false, length = 12000)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
     @Column(name = "created_at", nullable = false)

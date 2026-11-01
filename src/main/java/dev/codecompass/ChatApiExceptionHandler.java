@@ -29,6 +29,10 @@ public class ChatApiExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, String>> handleConstraint(DataIntegrityViolationException exception) {
+        String detail = exception.getMostSpecificCause() != null ? exception.getMostSpecificCause().getMessage() : "";
+        if (detail != null && (detail.contains("value too long") || detail.contains("too long") || detail.contains("truncation"))) {
+            return error(HttpStatus.PAYLOAD_TOO_LARGE, "The response or input was too large to save.");
+        }
         return error(HttpStatus.CONFLICT, "That change conflicts with existing account data.");
     }
 

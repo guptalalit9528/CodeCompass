@@ -34,7 +34,7 @@ public class ContextItem {
     @Column(nullable = false, length = 32)
     private String type;
 
-    @Column(nullable = false, length = 12000)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
     @Column(nullable = false)

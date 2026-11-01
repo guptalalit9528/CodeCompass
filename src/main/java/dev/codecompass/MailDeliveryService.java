@@ -61,9 +61,16 @@ public class MailDeliveryService {
     }
 
     public void sendVerification(String email, String rawToken) {
-        send(email, "Verify your CodeCompass account",
-                "Verify your email address by opening this one-time link:\n\n" + link("verify", rawToken)
-                        + "\n\nThis link expires in 24 hours. If you did not create this account, ignore this message.");
+        sendVerification(email, rawToken, null);
+    }
+
+    public void sendVerification(String email, String rawToken, String otp) {
+        String body = "Verify your email address by opening this one-time link:\n\n" + link("verify", rawToken);
+        if (StringUtils.hasText(otp)) {
+            body += "\n\nAlternatively, your 6-digit verification code is:\n" + otp;
+        }
+        body += "\n\nThis link expires in 24 hours. If you did not create this account, ignore this message.";
+        send(email, "Verify your CodeCompass account", body);
     }
 
     public void sendPasswordReset(String email, String rawToken) {

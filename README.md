@@ -1,6 +1,6 @@
 # CodeCompass
 
-CodeCompass is a developer support chatbot built with Java 25 and Spring Boot. It provides a web chat interface, Gemini-backed answers when configured, and offline troubleshooting guidance when no AI key is available. The same application includes account authentication, projects, saved conversations, and developer workspace tools.
+CodeCompass is a developer support chatbot built with Java 25 and Spring Boot. It provides a modern web chat interface, Gemini-backed answers when configured, and offline troubleshooting guidance when no AI key is available. The application includes robust account authentication, project isolation, conversation branching, AST code analysis, and developer workspace tools.
 
 ## Features
 
@@ -126,3 +126,11 @@ mvn package
 ```
 
 The tests use an in-memory database and mock external AI and email providers; they do not send real email or require a Gemini key.
+
+## Author
+
+- **Lalit Gupta** ([@guptalalit9528](https://github.com/guptalalit9528))
+
+## Contributors
+
+- **Gopal Gupta** ([@gopaljilab](https://github.com/gopaljilab))

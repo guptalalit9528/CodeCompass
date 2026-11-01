@@ -431,6 +431,9 @@
       display: grid;
       grid-template-columns: 270px 1fr;
       height: 100dvh;
+      max-height: 100dvh;
+      min-height: 0;
+      overflow: hidden;
       position: relative;
     }
 
@@ -450,29 +453,109 @@
     .sidebar-header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      padding-bottom: 4px;
+      gap: 10px;
+      padding-bottom: 6px;
     }
 
-    .btn-new-chat {
+    /* FULL-WIDTH PROMINENT NEW CHAT BUTTON (SUBTLE / SECONDARY HIERARCHY) */
+    .sidebar-action-wrap {
+      width: 100%;
+      margin-bottom: 2px;
+    }
+    .new-chat-btn {
+      width: 100%;
       background: var(--surface-card);
-      border: 1px solid var(--surface-border);
-      border-radius: var(--radius-sm);
       color: var(--text);
-      font-size: 12.5px;
-      font-weight: 700;
-      padding: 7px 12px;
-      display: inline-flex;
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 9px 13px;
+      font-size: 13.5px;
+      font-weight: 500;
+      display: flex;
       align-items: center;
-      gap: 6px;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    .new-chat-btn:hover {
+      background: var(--surface-hover);
+      border-color: var(--border-highlight);
+      color: var(--text);
+      transform: translateY(-1px);
+    }
+    .new-chat-btn:active {
+      transform: translateY(0);
+    }
+    .new-chat-left {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .new-chat-icon {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2.2;
+      flex-shrink: 0;
+      color: var(--text-muted);
+      transition: color 0.15s ease;
+    }
+    .new-chat-btn:hover .new-chat-icon {
+      color: var(--text);
+    }
+    .new-chat-text {
+      letter-spacing: -0.1px;
+    }
+    .new-chat-shortcut {
+      background: var(--surface);
+      color: var(--text-muted);
+      font-size: 10px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      padding: 2.5px 6.5px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+      border: 1px solid var(--surface-border);
+      user-select: none;
       transition: var(--transition-smooth);
     }
-    .btn-new-chat:hover {
-      background: var(--accent);
-      color: var(--accent-text);
-      border-color: var(--accent);
-      box-shadow: 0 2px 10px var(--accent-glow);
+    .new-chat-btn:hover .new-chat-shortcut {
+      border-color: var(--border-highlight);
+      color: var(--text);
+    }
+    .btn-new-chat {
+      display: none;
+    }
+
+    /* SIDEBAR EMPTY STATE */
+    .sidebar-empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px 12px;
+      gap: 6px;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+    .sidebar-empty-svg {
+      width: 22px;
+      height: 22px;
+      color: var(--text-dim);
+      opacity: 0.7;
+      margin-bottom: 2px;
+    }
+    .sidebar-empty-title {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 12px;
+    }
+    .sidebar-empty-desc {
+      font-size: 11px;
+      color: var(--text-dim);
+      max-width: 170px;
+      line-height: 1.4;
     }
 
     .sidebar-search {
@@ -810,36 +893,816 @@
     .main {
       display: flex;
       flex-direction: column;
+      height: 100%;
+      max-height: 100dvh;
+      min-height: 0;
       min-width: 0;
+      overflow: hidden;
       background: var(--bg);
       position: relative;
       transition: background 0.3s ease;
     }
 
+    /* ========================================================
+       TOPBAR WORKSPACE HEADER — Clean Two-Tier Architecture
+       ======================================================== */
     .topbar {
-      height: 56px;
+      position: sticky;
+      top: 0;
+      z-index: 25;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      width: 100%;
       border-bottom: 1px solid var(--surface-border);
+      background: var(--topbar-bg);
+      backdrop-filter: blur(12px);
+      padding: 0;
+      height: auto;
+      min-height: auto;
+    }
+
+    /* TOP ROW: Primary Navigation & Core Actions */
+    .topbar-primary-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 24px;
-      flex: none;
-      background: var(--topbar-bg);
-      backdrop-filter: blur(12px);
-      z-index: 5;
+      padding: 8px 16px;
+      gap: 12px;
+      min-width: 0;
     }
+
+    .topbar-nav-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1 1 auto;
+      overflow: hidden;
+    }
+
     .crumb {
-      font-size: 13px;
+      font-size: 13.5px;
       color: var(--text-dim);
       display: flex;
       align-items: center;
       gap: 6px;
+      min-width: 0;
+      overflow: hidden;
     }
     .crumb strong { color: var(--text); font-weight: 600; }
-    .topbar-actions {
+
+    .conversation-title-text {
+      color: var(--text);
+      font-weight: 600;
+      font-size: 14px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 420px;
+      min-width: 0;
+      display: inline-block;
+      vertical-align: middle;
+      cursor: default;
+    }
+
+    .project-breadcrumb-text {
+      font-size: 12px;
+      color: var(--text-dim);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Branch Badge — Compact Emerald Badge Style */
+    .branch-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: #10b981;
+      font-size: 12px;
+      font-weight: 600;
+      flex-shrink: 0;
+      line-height: 1.4;
+      transition: var(--transition-smooth);
+    }
+    .branch-badge:hover {
+      background: rgba(16, 185, 129, 0.16);
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+    [data-theme="light"] .branch-badge {
+      background: rgba(16, 185, 129, 0.12);
+      color: #047857;
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    .branch-badge-select {
+      background: transparent;
+      border: 0;
+      color: #10b981;
+      font-size: 11.5px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      outline: 0;
+      cursor: pointer;
+      padding: 0 2px;
+    }
+    [data-theme="light"] .branch-badge-select {
+      color: #047857;
+    }
+    .branch-badge-add {
+      background: transparent;
+      border: 0;
+      color: #10b981;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      padding: 0 2px;
+      line-height: 1;
+      border-radius: 4px;
+      transition: var(--transition-smooth);
+    }
+    .branch-badge-add:hover {
+      transform: scale(1.15);
+      color: #34d399;
+    }
+    [data-theme="light"] .branch-badge-add {
+      color: #047857;
+    }
+
+    .topbar-nav-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    /* Share Button (Subtle / Secondary Styling) */
+    .primary-share-btn {
+      background: var(--surface-card);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 11px;
+      border-radius: 8px;
+      border: 1px solid var(--surface-border);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    .primary-share-btn:hover {
+      background: var(--surface-hover);
+      border-color: var(--border-highlight);
+      color: var(--text);
+      transform: translateY(-1px);
+    }
+    .share-icon-svg {
+      width: 14px;
+      height: 14px;
+      stroke-width: 2.2;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    /* Ghost Theme Toggle */
+    .theme-toggle-ghost {
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      border-radius: 6px;
+      width: 30px;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+    .theme-toggle-ghost:hover {
+      background: var(--surface-hover);
+      color: var(--text);
+      border-color: var(--surface-border);
+    }
+
+    /* More Options Popover Dropdown (Kebab Menu) */
+    .header-more-wrapper {
+      position: relative;
+      display: inline-flex;
+    }
+    .header-kebab-btn {
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      border-radius: 6px;
+      width: 30px;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      line-height: 1;
+    }
+    .header-kebab-btn:hover,
+    .header-kebab-btn[aria-expanded="true"] {
+      background: var(--surface-hover);
+      color: var(--text);
+      border-color: var(--surface-border);
+    }
+    /* ========================================================
+       CENTERED GLASSMORPHIC MODAL DIALOG
+       ======================================================== */
+    dialog.glass-modal {
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: auto;
+      max-width: 100vw;
+      max-height: 100vh;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      outline: none;
+    }
+    dialog.glass-modal:not([open]) {
+      display: none;
+    }
+    dialog.glass-modal::backdrop {
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      animation: backdropFade 0.15s ease-out;
+    }
+    @keyframes backdropFade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .glass-modal-card {
+      width: min(440px, calc(100vw - 32px));
+      background: rgba(18, 24, 21, 0.95);
+      border: 1px solid var(--surface-border);
+      border-radius: 20px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      animation: modalPopIn 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+    }
+    [data-theme="light"] .glass-modal-card {
+      background: rgba(255, 255, 255, 0.96);
+      border-color: rgba(0, 0, 0, 0.1);
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    }
+    @keyframes modalPopIn {
+      from { opacity: 0; transform: scale(0.95) translateY(4px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* Modal Header */
+    .glass-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--surface-border);
+    }
+    .glass-modal-title-wrap {
       display: flex;
       align-items: center;
       gap: 10px;
+    }
+    .glass-modal-title-icon {
+      font-size: 16px;
+      line-height: 1;
+    }
+    .glass-modal-title {
+      margin: 0;
+      font-size: 15.5px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.2px;
+    }
+    .glass-modal-close-btn {
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      border-radius: 8px;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+    .glass-modal-close-btn:hover {
+      background: var(--surface-hover);
+      color: var(--text);
+      border-color: var(--surface-border);
+    }
+
+    /* Modal Body Content */
+    .glass-modal-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .modal-action-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--surface-border);
+      background: var(--surface-card);
+      color: var(--text);
+      text-align: left;
+      width: 100%;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      text-decoration: none;
+      box-sizing: border-box;
+      gap: 12px;
+    }
+    .modal-action-card:hover {
+      border-color: var(--accent);
+      background: var(--surface-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    }
+    [data-theme="light"] .modal-action-card:hover {
+      border-color: var(--brand-compass);
+    }
+
+    .modal-action-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      flex: 1;
+    }
+    .modal-action-icon-box {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .modal-action-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .modal-action-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .modal-action-desc {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .modal-action-right {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .modal-action-chevron {
+      font-size: 14px;
+      color: var(--text-dim);
+      transition: var(--transition-smooth);
+      font-weight: 700;
+    }
+    .modal-action-card:hover .modal-action-chevron {
+      color: var(--accent);
+      transform: translateX(2px);
+    }
+    [data-theme="light"] .modal-action-card:hover .modal-action-chevron {
+      color: var(--brand-compass);
+    }
+
+    .modal-card-select {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 6px 10px;
+      outline: none;
+      cursor: pointer;
+      max-width: 150px;
+      transition: var(--transition-smooth);
+    }
+    .modal-card-select:hover, .modal-card-select:focus {
+      border-color: var(--accent);
+    }
+
+    /* Destructive Action Card Styling */
+    .modal-action-card.destructive {
+      color: var(--danger);
+    }
+    .modal-action-card.destructive .modal-action-title {
+      color: var(--danger);
+    }
+    .modal-action-card.destructive .modal-action-icon-box {
+      background: var(--danger-bg);
+      border-color: var(--danger-border);
+    }
+    .modal-action-card.destructive:hover {
+      border-color: var(--danger-border);
+      background: var(--danger-bg);
+      box-shadow: 0 4px 14px rgba(255, 107, 107, 0.15);
+    }
+    .modal-action-card.destructive:hover .modal-action-chevron {
+      color: var(--danger);
+      transform: translateX(2px);
+    }
+
+    /* Modal Footer */
+    .glass-modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      padding: 12px 20px;
+      background: rgba(0, 0, 0, 0.12);
+      border-top: 1px solid var(--surface-border);
+    }
+    [data-theme="light"] .glass-modal-footer {
+      background: rgba(0, 0, 0, 0.03);
+    }
+    .glass-modal-done-btn {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+    .glass-modal-done-btn:hover {
+      background: var(--surface-hover);
+      border-color: var(--border-highlight);
+    }
+
+    /* ========================================================
+       CENTERED DELETE PROJECT CONFIRMATION MODAL
+       ======================================================== */
+    dialog.delete-project-modal {
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: auto;
+      max-width: 100vw;
+      max-height: 100vh;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      outline: none;
+    }
+    dialog.delete-project-modal:not([open]) {
+      display: none;
+    }
+    dialog.delete-project-modal::backdrop {
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      animation: backdropFade 0.15s ease-out;
+    }
+
+    .delete-modal-card {
+      width: min(440px, calc(100vw - 32px));
+      background: rgba(18, 24, 21, 0.96);
+      border: 1px solid rgba(239, 68, 68, 0.28);
+      border-radius: 20px;
+      box-shadow: 0 25px 65px -15px rgba(0, 0, 0, 0.8), 0 0 24px rgba(239, 68, 68, 0.08);
+      overflow: hidden;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      animation: modalPopIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+    }
+    [data-theme="light"] .delete-modal-card {
+      background: rgba(255, 255, 255, 0.98);
+      border-color: rgba(220, 38, 38, 0.25);
+      box-shadow: 0 25px 65px -15px rgba(0, 0, 0, 0.2), 0 0 20px rgba(220, 38, 38, 0.06);
+    }
+
+    /* Header & Badge */
+    .delete-modal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 22px 24px 16px;
+      border-bottom: 1px solid var(--surface-border);
+      gap: 16px;
+    }
+    .delete-modal-header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .delete-modal-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.22);
+      color: #ef4444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .delete-modal-badge-svg {
+      width: 22px;
+      height: 22px;
+    }
+    [data-theme="light"] .delete-modal-badge {
+      background: rgba(220, 38, 38, 0.08);
+      border-color: rgba(220, 38, 38, 0.2);
+      color: #dc2626;
+    }
+    .delete-modal-title {
+      margin: 0 0 2px;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+    .delete-modal-subtitle {
+      margin: 0;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .delete-modal-close-btn {
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      border-radius: 8px;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      flex-shrink: 0;
+    }
+    .delete-modal-close-btn:hover {
+      background: var(--surface-hover);
+      color: var(--text);
+      border-color: var(--surface-border);
+    }
+
+    /* Body */
+    .delete-modal-body {
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .delete-modal-warning-text {
+      margin: 0;
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+    .delete-modal-warning-text span {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* Warning Callout Box */
+    .delete-modal-callout {
+      background: rgba(239, 68, 68, 0.06);
+      border: 1px solid rgba(239, 68, 68, 0.18);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      color: #f87171;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    [data-theme="light"] .delete-modal-callout {
+      background: rgba(220, 38, 38, 0.05);
+      border-color: rgba(220, 38, 38, 0.18);
+      color: #b91c1c;
+    }
+    .delete-callout-icon {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .delete-callout-text strong {
+      font-weight: 700;
+    }
+
+    /* Footer */
+    .delete-modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 16px 24px;
+      background: rgba(0, 0, 0, 0.15);
+      border-top: 1px solid var(--surface-border);
+    }
+    [data-theme="light"] .delete-modal-footer {
+      background: rgba(0, 0, 0, 0.03);
+    }
+    .delete-cancel-btn {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+    .delete-cancel-btn:hover {
+      background: var(--surface-hover);
+      border-color: var(--border-highlight);
+    }
+    .delete-confirm-btn {
+      background: #dc2626;
+      border: 1px solid #b91c1c;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+    }
+    .delete-confirm-btn:hover {
+      background: #b91c1c;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4);
+    }
+    .delete-confirm-btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Loading Spinner */
+    .delete-spinner-icon {
+      width: 13px;
+      height: 13px;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* BOTTOM ROW: Sub-header Toolbar */
+    .topbar-sub-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 16px;
+      background: rgba(0, 0, 0, 0.15);
+      border-top: 1px solid var(--surface-border);
+      font-size: 12px;
+      color: var(--text-muted);
+      min-height: 32px;
+      gap: 12px;
+    }
+    [data-theme="light"] .topbar-sub-row {
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    .sub-row-left {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+    }
+
+    /* Session Metrics Button */
+    .telemetry-compact-btn {
+      background: transparent;
+      border: 0;
+      padding: 3px 6px;
+      border-radius: 4px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      opacity: 0.85;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+    .telemetry-compact-btn:hover {
+      opacity: 1;
+      color: var(--accent);
+      background: var(--surface-hover);
+    }
+    [data-theme="light"] .telemetry-compact-btn:hover {
+      color: var(--brand-compass);
+    }
+
+    .sub-row-right {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    /* View Mode Segmented Control */
+    .segmented-control {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.22);
+      padding: 2px;
+      border-radius: 6px;
+      border: 1px solid var(--surface-border);
+      gap: 2px;
+    }
+    [data-theme="light"] .segmented-control {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .segmented-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 3px 10px;
+      font-size: 11.5px;
+      font-weight: 500;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      line-height: 1.4;
+    }
+    .segmented-btn:hover {
+      color: var(--text);
+      background: var(--surface-hover);
+    }
+    .segmented-btn.active {
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+      border-color: var(--border-highlight);
     }
 
     .mobile-menu-btn {
@@ -855,7 +1718,8 @@
 
     /* CHAT STREAM */
     .chat-container {
-      flex: 1;
+      flex: 1 1 0%;
+      min-height: 0;
       overflow-y: auto;
       padding: 24px 20px;
       display: flex;
@@ -1009,7 +1873,7 @@
       color: var(--brand-compass);
     }
 
-    /* SUGGESTION TILES */
+    /* SUGGESTION TILES (HERO QUICK CARDS) */
     .suggestions {
       width: min(780px, 100%);
       margin: auto auto 20px;
@@ -1019,34 +1883,83 @@
     }
     .suggestion {
       border: 1px solid var(--surface-border);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-lg);
       background: var(--surface-card);
-      padding: 16px 14px;
+      padding: 16px 15px;
       text-align: left;
-      min-height: 84px;
+      min-height: 96px;
       color: var(--text);
-      transition: var(--transition-smooth);
+      cursor: pointer;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.2s ease,
+                  background-color 0.2s ease,
+                  box-shadow 0.22s ease;
+      position: relative;
     }
     .suggestion:hover {
       border-color: var(--accent);
       background: var(--surface-hover);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 0 0 1px var(--accent-glow);
     }
-    .suggestion strong { font-size: 13px; font-weight: 700; color: var(--text); }
-    .suggestion small {
+    .suggestion-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .suggestion-icon-wrap {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .suggestion:hover .suggestion-icon-wrap {
+      border-color: var(--border-highlight);
+      transform: scale(1.06);
+    }
+    .suggestion-icon {
+      width: 16px;
+      height: 16px;
+      display: block;
+    }
+    .suggestion-arrow {
+      font-size: 15px;
+      color: var(--text-dim);
+      transition: transform 0.2s ease, color 0.2s ease, text-shadow 0.2s ease;
+      line-height: 1;
+    }
+    .suggestion:hover .suggestion-arrow {
+      color: var(--accent);
+      transform: translateX(3px);
+      text-shadow: 0 0 8px var(--accent-glow);
+    }
+    .suggestion-body strong {
+      display: block;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.15px;
+    }
+    .suggestion-body small {
       display: block;
       color: var(--text-muted);
       font-size: 11.5px;
-      margin-top: 5px;
-      line-height: 1.4;
+      margin-top: 4px;
+      line-height: 1.45;
     }
 
     /* COMPOSER */
     .composer-wrap {
+      flex: none;
       width: 100%;
       padding: 0 24px 20px;
       background: linear-gradient(180deg, transparent, var(--bg) 25%);
@@ -1776,9 +2689,10 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(3px);
-      z-index: 15;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 45;
     }
 
     /* RESPONSIVE BREAKPOINTS */
@@ -1794,17 +2708,21 @@
         left: 0;
         top: 0;
         bottom: 0;
-        width: 280px;
+        width: 288px;
+        max-width: 85vw;
+        z-index: 50;
         transform: translateX(-100%);
+        box-shadow: none;
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       }
       .sidebar.mobile-open {
         transform: translateX(0);
-        box-shadow: 0 0 32px rgba(0, 0, 0, 0.7);
+        box-shadow: 0 0 45px rgba(0, 0, 0, 0.8);
       }
       .sidebar-backdrop.open { display: block; }
       .mobile-menu-btn { display: inline-flex; }
-      .suggestions { grid-template-columns: 1fr; }
-      .topbar { padding: 0 16px; }
+      .topbar { padding: 0; }
+      .topbar-primary-row, .topbar-sub-row { padding-left: 12px; padding-right: 12px; }
 
       /* Settings Mobile Layout */
       .settings-view { grid-template-columns: 1fr; }
@@ -1826,6 +2744,95 @@
       .account-dropdown {
         left: 10px;
         right: 10px;
+      }
+    }
+
+    /* MOBILE VIEWPORT OPTIMIZATIONS (< 640px) */
+    @media (max-width: 640px) {
+      /* Main Header Row */
+      .topbar-primary-row {
+        padding: 6px 12px;
+        gap: 8px;
+      }
+      .conversation-title-text {
+        max-width: 150px;
+        font-size: 13.5px;
+      }
+      .primary-share-btn {
+        padding: 6px 8px;
+      }
+      .primary-share-btn .share-text {
+        display: none;
+      }
+      .crumb {
+        gap: 4px;
+      }
+      .project-breadcrumb-text {
+        max-width: 80px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      /* Sub-Header / Metrics Bar */
+      .topbar-sub-row {
+        padding: 3px 12px;
+        gap: 8px;
+        min-height: 28px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .topbar-sub-row::-webkit-scrollbar {
+        display: none;
+      }
+      .telemetry-stat-desktop {
+        display: none !important;
+      }
+      .telemetry-compact-btn {
+        padding: 2px 4px;
+        font-size: 10.5px;
+      }
+      .segmented-control {
+        padding: 2px;
+        gap: 2px;
+      }
+      .segmented-btn {
+        padding: 2px 6px;
+        font-size: 11px;
+      }
+
+      /* Responsive Quick Cards: Stack vertically in 1 column */
+      .suggestions {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-bottom: 12px;
+        padding: 0 4px;
+      }
+      .suggestion {
+        min-height: 76px;
+        padding: 12px 14px;
+      }
+
+      /* Chat Composer: Hide hotkey hint and compact margins */
+      .composer-wrap {
+        padding: 0 12px 12px;
+      }
+      .composer {
+        padding: 8px 12px 8px;
+      }
+      .compose-bottom .hint {
+        display: none !important;
+      }
+    }
+
+    @media (min-width: 400px) and (max-width: 640px) {
+      .conversation-title-text {
+        max-width: 200px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .seg-label {
+        display: none;
       }
     }
   </style>
@@ -1971,8 +2978,19 @@
           <div class="brand-mark">⌘</div>
           <span class="brand-text"><em>Code</em>Compass</span>
         </div>
-        <button id="newChat" class="btn-new-chat" title="New chat (Ctrl+Shift+O)">
-          <span>+</span> New Chat
+      </div>
+
+      <!-- FULL-WIDTH PROMINENT NEW CHAT ACTION -->
+      <div class="sidebar-action-wrap">
+        <button id="newChat" class="new-chat-btn" title="New chat (Ctrl+Shift+O or ⌘N)" type="button">
+          <div class="new-chat-left">
+            <svg class="new-chat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span class="new-chat-text">New Chat</span>
+          </div>
+          <kbd class="new-chat-shortcut">⌘N</kbd>
         </button>
       </div>
 
@@ -2069,32 +3087,61 @@
 
     <!-- MAIN CONVERSATION WORKSPACE -->
     <main class="main">
+      <!-- TWO-TIER STICKY HEADER -->
       <header class="topbar">
-        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
-          <button id="mobileMenu" class="mobile-menu-btn" type="button" aria-label="Open navigation">☰</button>
-          <div class="crumb">
-            <span id="activeProjectLabel" class="hidden">Project / <strong id="projectNameLabel"></strong> · </span>
-            <strong id="conversationTitleLabel">New conversation</strong>
+        <!-- TOP ROW: Primary Navigation, Title, Branch & Core Actions -->
+        <div class="topbar-primary-row">
+          <div class="topbar-nav-left">
+            <button id="mobileMenu" class="mobile-menu-btn" type="button" aria-label="Open navigation">☰</button>
+            <div class="crumb">
+              <span id="activeProjectLabel" class="hidden project-breadcrumb-text">Project / <strong id="projectNameLabel"></strong> · </span>
+              <strong id="conversationTitleLabel" class="conversation-title-text" title="New conversation">New conversation</strong>
+            </div>
+            <div id="branchControl" class="branch-badge hidden" title="Active Branch">
+              <span class="branch-icon">🌿</span>
+              <select id="branchSelect" class="branch-badge-select" aria-label="Select conversation branch"></select>
+              <button id="newBranchBtn" class="branch-badge-add" title="Create new branch from here" type="button">+</button>
+            </div>
           </div>
-          <div id="branchControl" class="branch-control hidden">
-            <span>🌿</span>
-            <select id="branchSelect" class="branch-select" aria-label="Select conversation branch"></select>
-            <button id="newBranchBtn" class="branch-btn" title="Create new branch from here" type="button">+</button>
+
+          <div class="topbar-nav-right">
+            <button id="openShareBtn" class="primary-share-btn" type="button" title="Share conversation">
+              <span class="share-icon">👥</span>
+              <span class="share-text">Share</span>
+            </button>
+            <button id="appThemeToggle" class="theme-toggle-ghost" type="button" aria-label="Toggle theme" title="Toggle theme">
+              <span class="theme-icon">☀️</span>
+            </button>
+            <button id="headerMoreBtn" class="header-kebab-btn" type="button" aria-label="Options & Quick Actions" title="Options & Quick Actions">⋮</button>
           </div>
         </div>
-        <div class="topbar-actions" style="flex-wrap:wrap;gap:6px;">
-          <button id="telemetryBadge" class="telemetry-pill" type="button" title="View AI telemetry & token metrics">
-            ⏱️ <span id="telLatency">0</span>ms · <span id="telTokens">0</span> tok · <span id="telCost">$0.0000</span>
-          </button>
-          <button id="openContextBtn" class="pro-tool-btn" type="button" title="Pinned Context Drawer">📌 Context</button>
-          <button id="openCheckpointsBtn" class="pro-tool-btn" type="button" title="Conversation Timeline & Checkpoints">⏱️ Timeline</button>
-          <button id="openMultiModelBtn" class="pro-tool-btn" type="button" title="Compare Models">⚖️ Compare</button>
-          <button id="openShareBtn" class="pro-tool-btn" type="button" title="Share with Collaborators">👥 Share</button>
-          <select id="moveConversation" class="hidden" style="background:var(--surface-card);border:1px solid var(--surface-border);border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;"></select>
-          <button id="clearChat" class="secondary" style="padding:6px 12px;font-size:12.5px;">Clear</button>
-          <button id="appThemeToggle" class="theme-toggle" type="button" aria-label="Toggle theme">
-            <span class="theme-icon">☀️</span>
-          </button>
+
+        <!-- BOTTOM ROW: Sub-header Toolbar (Session Metrics & Segmented View Controls) -->
+        <div class="topbar-sub-row">
+          <div class="sub-row-left">
+            <button id="telemetryBadge" class="telemetry-compact-btn" type="button" title="View AI telemetry & token metrics">
+              <span class="telemetry-icon">⏱️</span>
+              <span class="telemetry-metrics">
+                <span class="telemetry-stat-desktop"><span id="telLatency">0</span> ms · </span>
+                <span id="telTokens" class="font-medium">0</span> tok
+                <span class="telemetry-stat-desktop"> · <span id="telCost">$0.0000</span></span>
+              </span>
+            </button>
+          </div>
+
+          <div class="sub-row-right">
+            <div class="segmented-control" role="group" aria-label="Workspace views">
+              <button id="openContextBtn" class="segmented-btn" type="button" title="Pinned Context Drawer">
+                <span class="seg-icon">📌</span> <span class="seg-label">Context</span>
+              </button>
+              <button id="openCheckpointsBtn" class="segmented-btn" type="button" title="Conversation Timeline & Checkpoints">
+                <span class="seg-icon">⏱️</span> <span class="seg-label">Timeline</span>
+              </button>
+              <button id="openMultiModelBtn" class="segmented-btn" type="button" title="Compare Models">
+                <span class="seg-icon">⚖️</span> <span class="seg-label">Compare</span>
+              </button>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -2109,16 +3156,56 @@
         <div class="chat" id="chat"></div>
         <div class="suggestions" id="suggestions">
           <button class="suggestion" data-prompt="What causes a NullPointerException in Java and how do I prevent it?">
-            <strong>Debug an error</strong>
-            <small>Inspect stack trace and root cause</small>
+            <div class="suggestion-top">
+              <div class="suggestion-icon-wrap">
+                <svg class="suggestion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#f87171;">
+                  <rect width="8" height="14" x="8" y="6" rx="4"></rect>
+                  <path d="m19 7-3 2"></path>
+                  <path d="m5 7 3 2"></path>
+                  <path d="m19 19-3-2"></path>
+                  <path d="m5 19 3-2"></path>
+                  <path d="M20 13h-4"></path>
+                  <path d="M4 13h4"></path>
+                  <path d="m10 4 1 2"></path>
+                  <path d="m14 4-1 2"></path>
+                </svg>
+              </div>
+              <span class="suggestion-arrow">→</span>
+            </div>
+            <div class="suggestion-body">
+              <strong>Debug an error</strong>
+              <small>Inspect stack trace and root cause</small>
+            </div>
           </button>
           <button class="suggestion" data-prompt="Explain dependency injection and Bean lifecycles in Spring Boot.">
-            <strong>Understand a concept</strong>
-            <small>Clear technical breakdown & patterns</small>
+            <div class="suggestion-top">
+              <div class="suggestion-icon-wrap">
+                <svg class="suggestion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#fbbf24;">
+                  <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path>
+                  <path d="M9 18h6"></path>
+                  <path d="M10 22h4"></path>
+                </svg>
+              </div>
+              <span class="suggestion-arrow">→</span>
+            </div>
+            <div class="suggestion-body">
+              <strong>Understand a concept</strong>
+              <small>Clear technical breakdown & patterns</small>
+            </div>
           </button>
           <button class="suggestion" data-prompt="My Spring Boot REST API returns 404 or 401. How do I systematically trace it?">
-            <strong>Trace an API issue</strong>
-            <small>Step-by-step diagnostic guide</small>
+            <div class="suggestion-top">
+              <div class="suggestion-icon-wrap">
+                <svg class="suggestion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#34d399;">
+                  <path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.48 12H2"></path>
+                </svg>
+              </div>
+              <span class="suggestion-arrow">→</span>
+            </div>
+            <div class="suggestion-body">
+              <strong>Trace an API issue</strong>
+              <small>Step-by-step diagnostic guide</small>
+            </div>
           </button>
         </div>
       </section>
@@ -2127,7 +3214,7 @@
         <form class="composer" id="chatForm">
           <textarea id="chatInput" maxlength="12000" placeholder="Ask a question, paste a stack trace, or share a code snippet… (Enter to send, Shift+Enter for new line)" rows="1"></textarea>
           <div class="compose-bottom">
-            <span class="hint">Press <kbd class="inline-code">Ctrl+K</kbd> to search · <kbd class="inline-code">Ctrl+Shift+O</kbd> new chat</span>
+            <span class="hint">Press <kbd class="inline-code">⌘K</kbd> to search · <kbd class="inline-code">⌘N</kbd> new chat</span>
             <button class="send" id="sendButton" type="submit" aria-label="Send">↑</button>
           </div>
         </form>
@@ -2901,11 +3988,19 @@
     <div class="table-container" style="margin:16px 0;">
       <table class="data-table">
         <tbody>
+          <tr><td colspan="2" style="background:var(--surface-hover);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);padding:6px 12px;">Active Chat / Turn Metrics</td></tr>
           <tr><td><strong>Roundtrip Latency</strong></td><td id="telModalLatency" class="mono">-- ms</td></tr>
           <tr><td><strong>Prompt Tokens (Input)</strong></td><td id="telModalPromptTokens" class="mono">--</td></tr>
           <tr><td><strong>Completion Tokens (Output)</strong></td><td id="telModalCompletionTokens" class="mono">--</td></tr>
-          <tr><td><strong>Total Tokens</strong></td><td id="telModalTotalTokens" class="mono">--</td></tr>
-          <tr><td><strong>Estimated Cost (USD)</strong></td><td id="telModalCost" class="mono" style="color:var(--brand-compass);font-weight:700;">$--</td></tr>
+          <tr><td><strong>Turn Tokens</strong></td><td id="telModalTotalTokens" class="mono">--</td></tr>
+          <tr><td><strong>Estimated Turn Cost</strong></td><td id="telModalCost" class="mono" style="color:var(--brand-compass);font-weight:700;">$--</td></tr>
+
+          <tr><td colspan="2" style="background:var(--surface-hover);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);padding:6px 12px;">Cumulative Lifetime / Workspace Usage</td></tr>
+          <tr><td><strong>Accumulated Tokens</strong></td><td id="telModalLifetimeTokens" class="mono" style="font-weight:700;color:var(--accent);">0</td></tr>
+          <tr><td><strong>Total Estimated Spend</strong></td><td id="telModalLifetimeCost" class="mono" style="font-weight:700;color:var(--brand-compass);">$0.0000</td></tr>
+          <tr><td><strong>Lifetime Prompts / Requests</strong></td><td id="telModalLifetimeRequests" class="mono">0</td></tr>
+
+          <tr><td colspan="2" style="background:var(--surface-hover);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);padding:6px 12px;">Environment & Engine</td></tr>
           <tr><td><strong>Active Model</strong></td><td id="telModalModel" class="mono">gemini-2.5-flash / fallback</td></tr>
           <tr><td><strong>Database Backend</strong></td><td id="telModalBackend" class="mono">Supabase PostgreSQL Pooler</td></tr>
         </tbody>
@@ -2935,6 +4030,169 @@
         <button class="primary" type="submit">Fork Branch</button>
       </div>
     </form>
+  </dialog>
+
+  <!-- 10. OPTIONS & QUICK ACTIONS CENTERED GLASSMODAL -->
+  <dialog id="optionsModal" class="glass-modal">
+    <div class="glass-modal-card">
+      <!-- Modal Header -->
+      <div class="glass-modal-header">
+        <div class="glass-modal-title-wrap">
+          <span class="glass-modal-title-icon">⚙️</span>
+          <h2 class="glass-modal-title">Options & Quick Actions</h2>
+        </div>
+        <button class="glass-modal-close-btn" data-close="optionsModal" type="button" aria-label="Close modal">✕</button>
+      </div>
+
+      <!-- Modal Body Content -->
+      <div class="glass-modal-body">
+        <!-- Move to Project Interactive Row -->
+        <div class="modal-action-card" id="optCardMove">
+          <div class="modal-action-left">
+            <div class="modal-action-icon-box">📁</div>
+            <div class="modal-action-text">
+              <strong class="modal-action-title">Move to Project</strong>
+              <span class="modal-action-desc">Organize conversation into a dedicated project workspace</span>
+            </div>
+          </div>
+          <div class="modal-action-right">
+            <select id="moveConversation" class="modal-card-select" aria-label="Move conversation to project"></select>
+          </div>
+        </div>
+
+        <!-- Share & Collaborate Interactive Row -->
+        <button type="button" class="modal-action-card" id="optCardShare">
+          <div class="modal-action-left">
+            <div class="modal-action-icon-box">👥</div>
+            <div class="modal-action-text">
+              <strong class="modal-action-title">Share & Collaborate</strong>
+              <span class="modal-action-desc">Invite engineering teammates or generate access link</span>
+            </div>
+          </div>
+          <div class="modal-action-right">
+            <span class="modal-action-chevron">→</span>
+          </div>
+        </button>
+
+        <!-- Fork Branch Interactive Row -->
+        <button type="button" class="modal-action-card" id="optCardBranch">
+          <div class="modal-action-left">
+            <div class="modal-action-icon-box">🌿</div>
+            <div class="modal-action-text">
+              <strong class="modal-action-title">Fork Solution Branch</strong>
+              <span class="modal-action-desc">Test alternative code fixes in an isolated branch</span>
+            </div>
+          </div>
+          <div class="modal-action-right">
+            <span class="modal-action-chevron">→</span>
+          </div>
+        </button>
+
+        <!-- Clear Chat Interactive Row (Destructive) -->
+        <button type="button" class="modal-action-card destructive" id="clearChat">
+          <div class="modal-action-left">
+            <div class="modal-action-icon-box destructive">🗑️</div>
+            <div class="modal-action-text">
+              <strong class="modal-action-title">Clear Conversation</strong>
+              <span class="modal-action-desc">Permanently remove message history in this chat</span>
+            </div>
+          </div>
+          <div class="modal-action-right">
+            <span class="modal-action-chevron destructive">→</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="glass-modal-footer">
+        <button type="button" class="glass-modal-done-btn" data-close="optionsModal">Done</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- 11. DELETE PROJECT CONFIRMATION CENTERED MODAL -->
+  <dialog id="deleteProjectModal" class="delete-project-modal">
+    <div class="delete-modal-card">
+      <!-- Modal Header & Icon Badge -->
+      <div class="delete-modal-header">
+        <div class="delete-modal-header-left">
+          <div class="delete-modal-badge" aria-hidden="true">
+            <svg class="delete-modal-badge-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="delete-modal-title">Delete Project?</h2>
+            <p class="delete-modal-subtitle">Permanent action requiring confirmation</p>
+          </div>
+        </div>
+        <button class="delete-modal-close-btn" data-close="deleteProjectModal" type="button" aria-label="Close dialog">✕</button>
+      </div>
+
+      <!-- Modal Body Content -->
+      <div class="delete-modal-body">
+        <p class="delete-modal-warning-text">
+          Are you sure you want to delete <span id="deleteProjectTargetName" class="font-semibold text-foreground">"Project"</span>? This action cannot be undone and will permanently remove all associated chats, branches, and session data.
+        </p>
+
+        <!-- Visual Accent: Subtle light-red warning callout box -->
+        <div class="delete-modal-callout">
+          <svg class="delete-callout-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <div class="delete-callout-text">
+            <strong>Warning:</strong> Any conversations, branches, and pinned context associated with this project will be deleted from your workspace.
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Footer Buttons -->
+      <div class="delete-modal-footer">
+        <button type="button" class="delete-cancel-btn" data-close="deleteProjectModal">Cancel</button>
+        <button type="button" class="delete-confirm-btn" id="confirmDeleteProjectBtn">
+          <span class="delete-spinner-icon hidden" id="deleteProjectSpinner"></span>
+          <span id="deleteProjectBtnText">Delete Project</span>
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- 12. CONVERSATION OPTIONS MODAL (REPLACES BROWSER PROMPT) -->
+  <dialog id="conversationActionModal" class="glass-modal">
+    <div class="glass-modal-card">
+      <div class="glass-modal-header">
+        <div class="glass-modal-title-wrap">
+          <span class="glass-modal-title-icon">💬</span>
+          <h2 class="glass-modal-title">Conversation Options</h2>
+        </div>
+        <button class="glass-modal-close-btn" data-close="conversationActionModal" type="button" aria-label="Close dialog">✕</button>
+      </div>
+      <div class="glass-modal-body">
+        <form id="renameConversationForm" style="display:flex;flex-direction:column;gap:8px;">
+          <label style="font-size:12px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;">Rename Conversation</label>
+          <div style="display:flex;gap:8px;">
+            <input id="renameConversationInput" maxlength="120" required style="flex:1;background:var(--surface-card);border:1px solid var(--surface-border);border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;color:var(--text);">
+            <button class="primary" type="submit" style="padding:8px 14px;font-size:12.5px;">Save</button>
+          </div>
+        </form>
+        <div style="height:1px;background:var(--surface-border);margin:6px 0;"></div>
+        <button type="button" class="modal-action-card destructive" id="deleteConversationCardBtn">
+          <div class="modal-action-left">
+            <div class="modal-action-icon-box destructive">🗑️</div>
+            <div class="modal-action-text">
+              <strong class="modal-action-title">Delete Conversation</strong>
+              <span class="modal-action-desc">Permanently remove this chat and all messages</span>
+            </div>
+          </div>
+          <div class="modal-action-right">
+            <span class="modal-action-chevron destructive">→</span>
+          </div>
+        </button>
+      </div>
+      <div class="glass-modal-footer">
+        <button type="button" class="glass-modal-done-btn" data-close="conversationActionModal">Close</button>
+      </div>
+    </div>
   </dialog>
 
   <!-- TOAST NOTIFICATION -->
@@ -3165,6 +4423,37 @@
       }
     });
 
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        toggleDropdown(false);
+        $('optionsModal')?.close();
+      }
+    });
+
+    // OPTIONS & QUICK ACTIONS CENTERED GLASSMODAL
+    if ($('headerMoreBtn')) {
+      $('headerMoreBtn').onclick = () => {
+        renderMoveOptions();
+        $('optionsModal').showModal();
+      };
+    }
+
+    $('optionsModal')?.addEventListener('click', (e) => {
+      if (e.target === $('optionsModal')) {
+        $('optionsModal').close();
+      }
+    });
+
+    $('optCardShare')?.addEventListener('click', () => {
+      $('optionsModal').close();
+      openShare();
+    });
+
+    $('optCardBranch')?.addEventListener('click', () => {
+      $('optionsModal').close();
+      $('newBranchBtn')?.click();
+    });
+
     // MOBILE SIDEBAR
     function closeMobileSidebar() {
       $('sidebar').classList.remove('mobile-open');
@@ -3192,7 +4481,8 @@
         openCommandPalette();
       }
 
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'o') {
+      if (((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'o') ||
+          ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n' && !e.shiftKey && !e.altKey)) {
         e.preventDefault();
         if (!window.location.hash.startsWith('#settings')) {
           newChat();
@@ -3520,12 +4810,40 @@
       box.appendChild(all);
 
       projects.forEach(p => {
-        const btn = document.createElement('button');
-        btn.className = `project-pill ${activeProjectId === p.id ? 'active' : ''}`;
-        btn.textContent = p.name;
-        btn.title = p.description || p.name;
-        btn.onclick = () => selectProject(p.id);
-        box.appendChild(btn);
+        const pill = document.createElement('div');
+        pill.className = `project-pill ${activeProjectId === p.id ? 'active' : ''}`;
+        pill.style.display = 'inline-flex';
+        pill.style.alignItems = 'center';
+        pill.style.gap = '6px';
+        pill.style.paddingRight = '6px';
+
+        const nameBtn = document.createElement('span');
+        nameBtn.textContent = p.name;
+        nameBtn.title = p.description || p.name;
+        nameBtn.style.cursor = 'pointer';
+        nameBtn.onclick = () => selectProject(p.id);
+
+        const editBtn = document.createElement('button');
+        editBtn.className = 'project-pill-settings';
+        editBtn.innerHTML = '⚙️';
+        editBtn.title = `Settings for ${p.name}`;
+        editBtn.type = 'button';
+        editBtn.style.background = 'transparent';
+        editBtn.style.border = 'none';
+        editBtn.style.cursor = 'pointer';
+        editBtn.style.fontSize = '11px';
+        editBtn.style.opacity = '0.7';
+        editBtn.style.padding = '0 2px';
+        editBtn.onmouseenter = () => editBtn.style.opacity = '1';
+        editBtn.onmouseleave = () => editBtn.style.opacity = '0.7';
+        editBtn.onclick = (e) => {
+          e.stopPropagation();
+          showProjectDialog(p);
+        };
+
+        pill.appendChild(nameBtn);
+        pill.appendChild(editBtn);
+        box.appendChild(pill);
       });
     }
 
@@ -3548,6 +4866,9 @@
       if (p) {
         $('activeProjectLabel').classList.remove('hidden');
         $('projectNameLabel').textContent = p.name;
+        $('activeProjectLabel').style.cursor = 'pointer';
+        $('activeProjectLabel').title = 'Click to edit project settings';
+        $('activeProjectLabel').onclick = () => showProjectDialog(p);
       } else {
         $('activeProjectLabel').classList.add('hidden');
       }
@@ -3565,16 +4886,22 @@
       renderConversations();
     }
 
+    let activeActionConversation = null;
+
     function renderConversations() {
       const box = $('conversations');
       box.replaceChildren();
 
       if (conversations.length === 0) {
         const empty = document.createElement('div');
-        empty.style.color = 'var(--text-dim)';
-        empty.style.fontSize = '12px';
-        empty.style.padding = '8px 10px';
-        empty.textContent = 'No conversations saved.';
+        empty.className = 'sidebar-empty-state';
+        empty.innerHTML = `
+          <svg class="sidebar-empty-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span class="sidebar-empty-title">No conversations yet</span>
+          <span class="sidebar-empty-desc">Click "New Chat" to begin a coding session</span>
+        `;
         box.appendChild(empty);
         return;
       }
@@ -3597,22 +4924,9 @@
         menuBtn.title = 'Conversation options';
         menuBtn.onclick = (e) => {
           e.stopPropagation();
-          const action = prompt(`Conversation: "${c.title}"\nType 'rename' or 'delete':`);
-          if (action === 'rename') {
-            const next = prompt('New title:', c.title);
-            if (next && next.trim()) {
-              api(`/api/conversations/${c.id}`, {method:'PATCH', body:JSON.stringify({title:next.trim()})})
-                .then(loadConversations).catch(err=>toast(err.message,true));
-            }
-          } else if (action === 'delete') {
-            if (confirm(`Delete "${c.title}"?`)) {
-              api(`/api/conversations/${c.id}`, {method:'DELETE'})
-                .then(() => {
-                  if (activeConversationId === c.id) newChat();
-                  loadConversations();
-                }).catch(err=>toast(err.message,true));
-            }
-          }
+          activeActionConversation = c;
+          $('renameConversationInput').value = c.title || '';
+          $('conversationActionModal').showModal();
         };
 
         row.appendChild(btn);
@@ -3627,7 +4941,9 @@
       renderConversations();
       renderMoveOptions();
       const conv = conversations.find(c => c.id === id);
-      $('conversationTitleLabel').textContent = conv ? conv.title : 'Active conversation';
+      const title = conv ? conv.title : 'Active conversation';
+      $('conversationTitleLabel').textContent = title;
+      $('conversationTitleLabel').title = title;
 
       try {
         await loadBranches(id);
@@ -3647,22 +4963,25 @@
 
     function renderMoveOptions() {
       const select = $('moveConversation');
+      if (!select) return;
       if (!activeConversationId) {
-        select.classList.add('hidden');
+        select.disabled = true;
+        select.innerHTML = '<option value="">(No active chat)</option>';
         return;
       }
+      select.disabled = false;
       select.classList.remove('hidden');
       select.replaceChildren();
 
       const general = document.createElement('option');
       general.value = '';
-      general.textContent = 'Move to: None (General)';
+      general.textContent = 'None (General)';
       select.appendChild(general);
 
       projects.forEach(p => {
         const opt = document.createElement('option');
         opt.value = p.id;
-        opt.textContent = `Move to: ${p.name}`;
+        opt.textContent = p.name;
         select.appendChild(opt);
       });
 
@@ -3677,8 +4996,11 @@
       renderConversations();
       renderMoveOptions();
       $('conversationTitleLabel').textContent = 'New conversation';
+      $('conversationTitleLabel').title = 'New conversation';
       $('chat').replaceChildren();
       setStarted();
+      perChatUsage = { latencyMs: 0, promptTokens: 0, completionTokens: 0, turnTokens: 0, turnCost: 0 };
+      renderTelemetryUI();
       $('chatInput').focus();
     }
 
@@ -3687,28 +5009,140 @@
       $('suggestions').classList.remove('hidden');
     }
 
-    // TELEMETRY TRACKER
-    let latestTelemetry = { latencyMs: 0, promptTokens: 0, completionTokens: 0, totalTokens: 0, estimatedCost: 0 };
+    // ==========================================================
+    // 2-TIER TOKEN USAGE & TELEMETRY STATE ARCHITECTURE
+    // Separates Per-Chat Turn Metrics from Cumulative Lifetime / Workspace Metrics
+    // ==========================================================
+    const USAGE_STORAGE_KEY_PREFIX = 'codecompass_total_usage_';
+
+    function getUsageStorageKey() {
+      return USAGE_STORAGE_KEY_PREFIX + (currentUser?.id || 'default');
+    }
+
+    // Cumulative Lifetime / Workspace Metrics (Persisted across sessions)
+    let totalUsageStats = {
+      totalTokens: 0,
+      totalCost: 0,
+      totalRequests: 0,
+      lastLatencyMs: 0
+    };
+
+    // Per-Chat Turn Metrics (Transient to current conversation turn)
+    let perChatUsage = {
+      latencyMs: 0,
+      promptTokens: 0,
+      completionTokens: 0,
+      turnTokens: 0,
+      turnCost: 0
+    };
+
+    function loadPersistedUsageStats() {
+      try {
+        const raw = localStorage.getItem(getUsageStorageKey());
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          totalUsageStats.totalTokens = Math.max(0, Number(parsed.totalTokens) || 0);
+          totalUsageStats.totalCost = Math.max(0, Number(parsed.totalCost) || 0);
+          totalUsageStats.totalRequests = Math.max(0, Number(parsed.totalRequests) || 0);
+          totalUsageStats.lastLatencyMs = Math.max(0, Number(parsed.lastLatencyMs) || 0);
+        }
+      } catch (err) {
+        console.warn('Could not load totalUsageStats from localStorage', err);
+      }
+    }
+
+    function persistUsageStats() {
+      try {
+        localStorage.setItem(getUsageStorageKey(), JSON.stringify(totalUsageStats));
+      } catch (err) {
+        console.warn('Could not persist totalUsageStats', err);
+      }
+    }
+
+    async function syncUsageStatsFromBackend() {
+      try {
+        const summary = await api('/api/settings/usage');
+        if (summary) {
+          if (typeof summary.totalTokens === 'number' && summary.totalTokens > totalUsageStats.totalTokens) {
+            totalUsageStats.totalTokens = summary.totalTokens;
+            totalUsageStats.totalRequests = summary.totalRequests || totalUsageStats.totalRequests;
+            const computedCost = totalUsageStats.totalTokens * 0.0000015;
+            if (!totalUsageStats.totalCost || totalUsageStats.totalCost < computedCost) {
+              totalUsageStats.totalCost = computedCost;
+            }
+          }
+          persistUsageStats();
+          renderTelemetryUI();
+        }
+      } catch (err) {
+        // Non-blocking sync error
+      }
+    }
+
+    function formatTokensCompact(num) {
+      if (!num || num <= 0) return '0';
+      if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
+      return num.toLocaleString();
+    }
+
+    function renderTelemetryUI() {
+      // Top Header Toolbar: Displays Last Latency & Cumulative Lifetime / Workspace Metrics
+      const latency = totalUsageStats.lastLatencyMs || perChatUsage.latencyMs || 0;
+      if ($('telLatency')) $('telLatency').textContent = latency;
+      if ($('telTokens')) {
+        const fullTokens = totalUsageStats.totalTokens || 0;
+        $('telTokens').textContent = fullTokens >= 1000 ? formatTokensCompact(fullTokens) : fullTokens.toLocaleString();
+        $('telTokens').title = `${fullTokens.toLocaleString()} accumulated lifetime tokens`;
+      }
+      if ($('telCost')) $('telCost').textContent = '$' + Number(totalUsageStats.totalCost).toFixed(4);
+
+      // Telemetry Modal: Detailed Breakdown
+      if ($('telModalLatency')) $('telModalLatency').textContent = (perChatUsage.latencyMs || latency) + ' ms';
+      if ($('telModalPromptTokens')) $('telModalPromptTokens').textContent = (perChatUsage.promptTokens || 0).toLocaleString();
+      if ($('telModalCompletionTokens')) $('telModalCompletionTokens').textContent = (perChatUsage.completionTokens || 0).toLocaleString();
+      if ($('telModalTotalTokens')) $('telModalTotalTokens').textContent = (perChatUsage.turnTokens || 0).toLocaleString();
+      if ($('telModalCost')) $('telModalCost').textContent = '$' + Number(perChatUsage.turnCost || 0).toFixed(6);
+
+      // Cumulative Lifetime Rows in Modal
+      if ($('telModalLifetimeTokens')) $('telModalLifetimeTokens').textContent = totalUsageStats.totalTokens.toLocaleString();
+      if ($('telModalLifetimeCost')) $('telModalLifetimeCost').textContent = '$' + Number(totalUsageStats.totalCost).toFixed(4);
+      if ($('telModalLifetimeRequests')) $('telModalLifetimeRequests').textContent = totalUsageStats.totalRequests.toLocaleString();
+    }
+
     function updateTelemetry(data) {
       if (!data) return;
-      latestTelemetry = {
-        latencyMs: data.latencyMs || 0,
-        promptTokens: data.promptTokens || 0,
-        completionTokens: data.completionTokens || 0,
-        totalTokens: data.totalTokens || 0,
-        estimatedCost: data.estimatedCost || 0
-      };
-      $('telLatency').textContent = latestTelemetry.latencyMs;
-      $('telTokens').textContent = latestTelemetry.totalTokens;
-      $('telCost').textContent = '$' + Number(latestTelemetry.estimatedCost).toFixed(4);
 
-      $('telModalLatency').textContent = latestTelemetry.latencyMs + ' ms';
-      $('telModalPromptTokens').textContent = latestTelemetry.promptTokens;
-      $('telModalCompletionTokens').textContent = latestTelemetry.completionTokens;
-      $('telModalTotalTokens').textContent = latestTelemetry.totalTokens;
-      $('telModalCost').textContent = '$' + Number(latestTelemetry.estimatedCost).toFixed(6);
+      const latencyMs = Number(data.latencyMs) || 0;
+      const promptTokens = Number(data.promptTokens) || 0;
+      const completionTokens = Number(data.completionTokens) || 0;
+      const turnTokens = Number(data.totalTokens) || (promptTokens + completionTokens);
+      const turnCost = Number(data.estimatedCost) || (turnTokens * 0.0000015);
+
+      // 1. Update Per-Chat Current Turn Metrics
+      perChatUsage = {
+        latencyMs,
+        promptTokens,
+        completionTokens,
+        turnTokens,
+        turnCost
+      };
+
+      // 2. Accumulate into Cumulative Lifetime / Workspace Metrics
+      totalUsageStats.lastLatencyMs = latencyMs;
+      totalUsageStats.totalTokens += turnTokens;
+      totalUsageStats.totalCost += turnCost;
+      totalUsageStats.totalRequests += 1;
+
+      // 3. Persist and Update UI
+      persistUsageStats();
+      renderTelemetryUI();
     }
-    $('telemetryBadge').onclick = () => $('telemetryModal').showModal();
+
+    $('telemetryBadge').onclick = () => {
+      renderTelemetryUI();
+      $('telemetryModal').showModal();
+    };
 
     function appendMessage(role, text) {
       $('welcome').classList.add('hidden');
@@ -3733,8 +5167,15 @@
         row.appendChild(bubble);
       }
 
-      $('chat').appendChild(row);
-      $('chat').scrollTop = $('chat').scrollHeight;
+      const chat = $('chat');
+      chat.appendChild(row);
+      const container = chat.closest('.chat-container') || chat.parentElement;
+      if (container) {
+        requestAnimationFrame(() => {
+          container.scrollTop = container.scrollHeight;
+          row.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        });
+      }
     }
 
     // CODE ACTIONS & SNIPPET HELPERS
@@ -4096,8 +5537,20 @@
       }
     };
 
+    // SEGMENTED VIEW CONTROL STATE HIGHLIGHTING
+    function setActiveSegment(tab) {
+      $('openContextBtn')?.classList.toggle('active', tab === 'context');
+      $('openCheckpointsBtn')?.classList.toggle('active', tab === 'timeline');
+      $('openMultiModelBtn')?.classList.toggle('active', tab === 'compare');
+    }
+
+    $('contextDrawer')?.addEventListener('close', () => setActiveSegment(null));
+    $('checkpointsModal')?.addEventListener('close', () => setActiveSegment(null));
+    $('multiModelModal')?.addEventListener('close', () => setActiveSegment(null));
+
     // 5. CONVERSATION CONTEXT & PINNING DRAWER
     async function openContextDrawer() {
+      setActiveSegment('context');
       $('contextDrawer').showModal();
       await loadContextItems();
     }
@@ -4161,6 +5614,7 @@
 
     // 6. MULTI-MODEL SIDE-BY-SIDE BENCHMARK
     function openMultiModel() {
+      setActiveSegment('compare');
       $('multiModelModal').showModal();
     }
     $('openMultiModelBtn').onclick = openMultiModel;
@@ -4212,6 +5666,7 @@
         toast('Please select an active conversation to view checkpoints.', true);
         return;
       }
+      setActiveSegment('timeline');
       $('checkpointsModal').showModal();
       await loadCheckpoints();
     }
@@ -4338,6 +5793,7 @@
 
     // MOVE CONVERSATION
     $('moveConversation').addEventListener('change', async () => {
+      $('optionsModal')?.close();
       if (!activeConversationId) return;
       try {
         const target = $('moveConversation').value || null;
@@ -4389,26 +5845,103 @@
       }
     };
 
-    $('deleteProjectButton').onclick = async () => {
+    let pendingDeleteProjectId = null;
+
+    function openDeleteProjectModal(id, name) {
+      pendingDeleteProjectId = id;
+      const project = projects.find(p => p.id === id);
+      const projName = name || project?.name || 'this project';
+      $('deleteProjectTargetName').textContent = `"${projName}"`;
+      $('confirmDeleteProjectBtn').disabled = false;
+      $('deleteProjectSpinner').classList.add('hidden');
+      $('deleteProjectBtnText').textContent = 'Delete Project';
+      $('projectDialog')?.close();
+      $('deleteProjectModal').showModal();
+    }
+
+    $('deleteProjectButton').onclick = () => {
       const id = $('projectId').value;
       if (!id) return;
-      if (confirm('Delete this project? Associated conversations will be preserved.')) {
-        try {
-          await api(`/api/projects/${id}`, {method:'DELETE'});
-          $('projectDialog').close();
-          if (activeProjectId === id) {
-            activeProjectId = null;
-            activeConversationId = null;
-            newChat();
-          }
-          await loadProjects();
-          await loadConversations();
-          toast('Project deleted.');
-        } catch (err) {
-          toast(err.message, true);
+      const name = $('projectName').value.trim();
+      openDeleteProjectModal(id, name);
+    };
+
+    $('confirmDeleteProjectBtn').onclick = async () => {
+      if (!pendingDeleteProjectId) return;
+      const id = pendingDeleteProjectId;
+      $('confirmDeleteProjectBtn').disabled = true;
+      $('deleteProjectSpinner').classList.remove('hidden');
+      $('deleteProjectBtnText').textContent = 'Deleting...';
+
+      try {
+        await api(`/api/projects/${encodeURIComponent(id)}`, {method:'DELETE'});
+        $('deleteProjectModal').close();
+        if (activeProjectId === id) {
+          activeProjectId = null;
+          activeConversationId = null;
+          newChat();
         }
+        await loadProjects();
+        await loadConversations();
+        toast('Project deleted.');
+      } catch (err) {
+        toast(err.message, true);
+        $('confirmDeleteProjectBtn').disabled = false;
+        $('deleteProjectSpinner').classList.add('hidden');
+        $('deleteProjectBtnText').textContent = 'Delete Project';
+      } finally {
+        pendingDeleteProjectId = null;
       }
     };
+
+    $('deleteProjectModal')?.addEventListener('click', (e) => {
+      if (e.target === $('deleteProjectModal')) {
+        $('deleteProjectModal').close();
+      }
+    });
+
+    // CONVERSATION ACTIONS MODAL (REPLACES BROWSER PROMPT)
+    $('renameConversationForm').onsubmit = async (e) => {
+      e.preventDefault();
+      if (!activeActionConversation) return;
+      const next = $('renameConversationInput').value.trim();
+      if (!next) return;
+      try {
+        await api(`/api/conversations/${activeActionConversation.id}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ title: next })
+        });
+        $('conversationActionModal').close();
+        if (activeConversationId === activeActionConversation.id) {
+          $('conversationTitleLabel').textContent = next;
+          $('conversationTitleLabel').title = next;
+        }
+        await loadConversations($('conversationSearch').value.trim());
+        toast('Conversation renamed.');
+      } catch (err) {
+        toast(err.message, true);
+      }
+    };
+
+    $('deleteConversationCardBtn').onclick = async () => {
+      if (!activeActionConversation) return;
+      const conv = activeActionConversation;
+      $('conversationActionModal').close();
+      try {
+        await api(`/api/conversations/${conv.id}`, {method: 'DELETE'});
+        if (activeConversationId === conv.id) newChat();
+        await loadConversations($('conversationSearch').value.trim());
+        toast('Conversation deleted.');
+      } catch (err) {
+        toast(err.message, true);
+      }
+    };
+
+    $('conversationActionModal')?.addEventListener('click', (e) => {
+      if (e.target === $('conversationActionModal')) {
+        $('conversationActionModal').close();
+      }
+    });
 
     // AUTH FORMS
     $('loginForm').onsubmit = async (e) => {
@@ -4425,6 +5958,9 @@
         $('authScreen').classList.add('hidden');
         $('appShell').classList.remove('hidden');
         renderAccount();
+        loadPersistedUsageStats();
+        renderTelemetryUI();
+        syncUsageStatsFromBackend();
         await loadProjects();
         await loadConversations();
         handleRoute();
@@ -4558,6 +6094,9 @@
         $('authScreen').classList.add('hidden');
         $('appShell').classList.remove('hidden');
         renderAccount();
+        loadPersistedUsageStats();
+        renderTelemetryUI();
+        syncUsageStatsFromBackend();
         await loadProjects();
         await loadConversations();
         handleRoute();
@@ -4682,6 +6221,7 @@
 
     $('newChat').onclick = () => { closeMobileSidebar(); newChat(); };
     $('clearChat').onclick = async () => {
+      $('optionsModal')?.close();
       if (!activeConversationId) { newChat(); return; }
       try {
         await api('/api/chat/' + encodeURIComponent(activeConversationId), {method:'DELETE'});
@@ -4722,10 +6262,25 @@
           return;
         }
 
+        const isMac = (navigator.userAgent || '').toLowerCase().includes('mac');
+        const shortcutK = isMac ? '⌘K' : 'Ctrl+K';
+        const shortcutN = isMac ? '⌘N' : 'Ctrl+N';
+        const hintSpan = document.querySelector('.compose-bottom .hint');
+        if (hintSpan) {
+          hintSpan.innerHTML = `Press <kbd class="inline-code">${shortcutK}</kbd> to search · <kbd class="inline-code">${shortcutN}</kbd> new chat`;
+        }
+        const kbdBadge = document.querySelector('.new-chat-shortcut');
+        if (kbdBadge) {
+          kbdBadge.textContent = shortcutN;
+        }
+
         currentUser = await api('/api/auth/me');
         $('authScreen').classList.add('hidden');
         $('appShell').classList.remove('hidden');
         renderAccount();
+        loadPersistedUsageStats();
+        renderTelemetryUI();
+        syncUsageStatsFromBackend();
         await loadProjects();
         await loadConversations();
         handleRoute();
