@@ -558,6 +558,7 @@ Contributions make open-source projects thrive! Whether it's a bug fix, feature 
 ---
 
 ## 👥 Authors & Contributors
+QFGPJE
 
 <a href="https://github.com/guptalalit9528/CodeCompass/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=guptalalit9528/CodeCompass" alt="Contributors" />
